@@ -12,10 +12,7 @@ const slashCommands = {
     } else {
         message = `Error: userLocation: ${userLocation}, userLogin: ${userLogin}`;
     }
-    if(userData.login === username) {
-        console.log(`인사 메시지 수신 channel:${channelId}`);
-        postMessageToSlack(message, channelId);
-    }
+    postMessageToSlack(message, channelId);
   },
   salary: async function(userData, username, channelId) {
     let message;
