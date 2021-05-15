@@ -8,16 +8,17 @@ router.use(bodyParser.urlencoded({
   extended: true
 }));
 
-const getApi42 = require('../libs/getApi42');
+const useApi42 = require('../libs/useApi42');
 
 router.post('/', async (req, res, next) => {
   const body = req.body;
   const channelId = body.channel_id;
 
-  const userData = await getApi42.run(res, body.text);
+  const userData = await useApi42.run(res, body.text);
 
   let result;
-  const slackCmd = getApi42.slackCommand(cmdKey);
+  // add other APIs and 
+  const slackCmd = await useApi42.getCommand(cmdKey);
   if (typeof slackCmd === 'function') {
     result = await slackCmd(userData, channelId);
     res.sendStatus(200, '');
