@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-//const { WebClient } = require('@slack/web-api');
 
 const bodyParser = require('body-parser');
 router.use(bodyParser.json());
@@ -9,51 +8,51 @@ router.use(bodyParser.urlencoded({
   extended: true
 }));
 
-//const token = process.env.SLACK_TOKEN;
-//const web = new WebClient(token); 
-
 const getUserData = require('../libs/getUserData');
 const slashCommands = require('../libs/slashCommands');
 
-const getApi42UriPart = function (key, username) {
+const getApi42UriPart = function (cmdKey, username) {
   let uriPart
-  const partA = ['/where'];
-  const partB = ['/salary'];
+  const partA = ['where'];
+  const partB = ['salary'];
 
-  if (partA.includes(key))
+  if (partA.includes(cmdKey))
     uriPart = `/users/${username}`;
-  else if (partB.includes(key))
+  else if (partB.includes(cmdKey))
     uriPart = `/users/${username}/coalitions_users`;
   else
     uriPart = null;
   return uriPart;
 }
 
-const getSlackCommand = function(key) {
+const getSlackCommand = function(cmdKey) {
   const cmdMap = {
-    '/where': slashCommands.where,
-    '/salary': slashCommands.salary,
+    'where': slashCommands.where,
+    'salary': slashCommands.salary,
   }
-  return (cmdMap[key]) ? cmdMap[key] : key;
+  return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
 }
 
 router.post('/', async (req, res, next) => {
   const body = req.body;
-  const slashCommand = body.command;
-  const slashText = body.text;
   const channelId = body.channel_id;
 
-  const uriPart = getApi42UriPart(slashCommand, slashText);
-  if (uriPart === null)
-    res.sendStatus(200, '없는 명령어입니다.').send('404');
+  const tmpStrArr = body.text.split(' ', 2);
+  [cmdKey, username] = [tmpStrArr[0], tmpStrArr[1]];
+  console.log("cmdKey: ", cmdKey, "username: ", username);
 
+  let uriPart;
+  uriPart = await getApi42UriPart(cmdKey, username);
+  if (!uriPart) {
+    res.sendStatus(200, '없는 명령어입니다.').send('404');
+    return ;
+  }
   const userData = await getUserData(res, uriPart, channelId);
 
-  //const key = (req.body) ? req.body.text : '';
   let result;
-  const slackCmd = getSlackCommand(slashCommand);
+  const slackCmd = getSlackCommand(cmdKey);
   if (typeof slackCmd === 'function') {
-    result = await slackCmd(userData, slashText, channelId);
+    result = await slackCmd(userData, channelId);
     res.sendStatus(200, '');
   } else {
     result = '🤖Hmm... but don’t panic!';
