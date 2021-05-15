@@ -24,12 +24,12 @@ const getClientCredentials = oauth.client(axios.create(), {
 });
 
 const api42 = {
-  getUserData: async function (username) {
+  getUserData: async function (uriPart) {
     const clientCredentials = await getClientCredentials();
     const tmp = {...clientCredentials};
-    const userUri = `${END_POINT_42_API}/v2/users/${username}/coalitions_users`;
-    //const userUri = `${END_POINT_42_API}/v2/users/${username}`;
-    const response = await axios.all([axios42(tmp.access_token).get(userUri)]);
+
+    useUri = `${END_POINT_42_API}/v2/${uriPart}`;
+    const response = await axios.all([axios42(tmp.access_token).get(useUri)]);
     ret = { ...response[0].data };
     return ret;
   }

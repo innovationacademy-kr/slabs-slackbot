@@ -1,11 +1,10 @@
 const api42 = require('../services/api42');
 const postMessageToSlack = require('../common/postMessageToSlack');
 
-const getUserData = async (username, channelId) => {
-  console.log("userseurseuarlksjdflksajdl;fja");
+const getUserData = async (res, uriPart, channelId) => {
   let userData;
   try {
-    userData = await api42.getUserData(username);
+    userData = await api42.getUserData(uriPart);
   } catch (err) {
     const error = new Error("[user.js] getUserData: " + err.message);
     error.status = (err.response) ? err.response.status : 500;
