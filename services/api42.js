@@ -6,6 +6,7 @@ const TOKEN_REQUEST_TIME_OUT = 4000;
 const END_POINT_42_API = "https://api.intra.42.fr";
 
 const axios42 = function (accessToken) {
+  // make instance for using axios
   const axios42 = axios.create({
     baseURL: END_POINT_42_API,
     'headers': { 'Authorization': 'Bearer ' + accessToken },

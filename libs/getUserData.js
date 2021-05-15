@@ -1,5 +1,5 @@
-const api42 = require('../../services/api42');
-const postMessageToSlack = require('../../common/postMessageToSlack');
+const api42 = require('../services/api42');
+const postMessageToSlack = require('../common/postMessageToSlack');
 
 const getUserData = async (res, uriPart, channelId) => {
   let userData;

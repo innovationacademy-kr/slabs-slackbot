@@ -1,6 +1,6 @@
 const postMessageToSlack = require('../common/postMessageToSlack');
 
-const api42Commands = {
+const slashCommands = {
   where: async function(userData, channelId) {
     let message;
     const userLogin = userData.login;
@@ -30,4 +30,4 @@ const api42Commands = {
   }
 }
 
-module.exports = api42Commands;
+module.exports = slashCommands;
