@@ -14,10 +14,10 @@ router.post('/', async (req, res, next) => {
   const body = req.body;
   const channelId = body.channel_id;
 
+  // TODO api 선택해서 적용할 수 있도록 각 API에 대한 객체 생성
   const userData = await useApi42.run(res, body.text);
 
   let result;
-  // add other APIs and 
   const slackCmd = await useApi42.getCommand(cmdKey);
   if (typeof slackCmd === 'function') {
     result = await slackCmd(userData, channelId);
