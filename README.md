@@ -8,8 +8,8 @@
   - [Slack API page](https://api.slack.com)에 `create a custom app`(초록색 버튼)을 눌러 봇을 생성합니다.
   - ***Features***(왼쪽배너)에 있는 OAuth & permision의 `Bot User OAuth Token`을 받을 수 있습니다.
 ### 테스트용 슬랙봇에 기능 추가하기
-  - ***Features***(왼쪽배너)에 있는 `Event Subscriptions`와 `Slash Commands` 기능을 사용시,  
-    서비스 URL(aws, heroku와 같은)을 Request URL에 등록합니다.
+  - ***Features***(왼쪽배너)에 `Event Subscriptions` 혹은 `Slash Commands` 기능을 사용할 수 있습니다.  
+  - 각 기능을 사용하기 위해서 기능을 켜고 서비스 URL(aws, heroku와 같은)을 `Request URL`에 등록합니다.
     
 ## .env 파일 설정하기
   1. 생성된 42API app의 UID, SECRET, REDIRECT URI를 기입합니다.
