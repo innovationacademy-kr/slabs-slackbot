@@ -4,6 +4,8 @@ const session = require('express-session');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 const logger = require('morgan');
+let token = '';
+global.token = token;
 
 const app = express();
 
