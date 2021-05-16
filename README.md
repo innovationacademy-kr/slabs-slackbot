@@ -1,17 +1,22 @@
 # Slack bot
-## 개인 환경 설정하기
-- intra 42에서 앱등록하기(UID, SECRET 받기)
-  - [42 intra API page](https://api.intra.42.fr/apidoc)
-  - `Your apps(오른쪽 배너)` -> 
-  - intra.42.fr - setting - API -  register a new app - specify redirect URL 
-- Slack API에서 테스트용 슬랙봇 생성하기(BOT TOKEN 받기)
-  - [Slack API page](https://api.slack.com)
-  - api.slack.com - create a custom app - add feature(Slash Commands, Bots, Permision) - OAuth & permision
-- Install the app on the Slack workspace
+## 42 API app 및 Slack API 봇 생성하기
+### intra 42에서 앱등록하기(UID, SECRET, REDIRECT URI 받기)
+  - [42 intra API application page](https://profile.intra.42.fr/oauth/applications)
+  - `REGISTER A NEW APP` -> `Redirect URI` 기입 -> YOUR APPLICATIONS에서 생성된 앱 확인
+  - 생성된 앱에 들어가면, UID, SECRET, REDIRECT URI를 받을 수 있습니다.
+### Slack API에서 테스트용 슬랙봇 생성하기(BOT TOKEN 받기)
+  - [Slack API page](https://api.slack.com)에 `create a custom app`(초록색 버튼)을 눌러 봇을 생성합니다.
+  - ***Features***(왼쪽배너)에 있는 OAuth & permision의 `Bot User OAuth Token`을 받을 수 있습니다.
+### 테스트용 슬랙봇에 기능 추가하기
+  - ***Features***(왼쪽배너)에 있는 `Event Subscriptions`와 `Slash Commands` 기능을 사용시,  
+    서비스 URL(aws, heroku와 같은)을 Request URL에 등록합니다.
+    
+## .env 파일 설정하기
+  1. 생성된 42API app의 UID, SECRET, REDIRECT URI를 기입합니다.
+  2. 슬랙봇의 BOT TOKEN을 기입합니다.
+  3. 사용할 PORT 번호를 기입합니다.
+
 ## 빌드
-1. `.env.sample`에서 요구하는 값을 넣고 `.env`로 저장합니다.
-2. slack workspace에 개인이 만든 slack bot 등록합니다.
-3. 구현된 명령어 입력하여 사용해봅니다.
 ```shell
 git clone https://github.com/innovationacademy-kr/slabs-slackbot
 cd slabs-slackbot
@@ -19,12 +24,13 @@ npm i
 cp .env.sample .env
 npm start
 ```
+
 ## 명령어
 - 클러스태 내 카뎃의 위치를 조회합니다.  
   `/{botName} where {intra_id}`
-- 해당 카뎃의 지원금 수령 가능여부 조회합니다.
+- 해당 카뎃의 지원금 수령 가능여부 조회합니다.  
   `/{botName} salary {intra_id}`
-- 문의에일 주소를 받습니다.
+- 문의에일 주소를 받습니다.  
   `/{botName} mail`
 - bot 사용법에 대한 내용을 조회합니다.  
   `/{botName} help`
