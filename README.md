@@ -10,8 +10,8 @@
 - Install the app on the Slack workspace
 ## 빌드
 1. `.env.sample`에서 요구하는 값을 넣고 `.env`로 저장합니다.
-2. slack workspace에 개인이 만든 slack bot 등록하기
-3. 구현된 명령어 입력하여 사용해보기 
+2. slack workspace에 개인이 만든 slack bot 등록합니다.
+3. 구현된 명령어 입력하여 사용해봅니다.
 ```shell
 git clone https://github.com/innovationacademy-kr/slabs-slackbot
 cd slabs-slackbot
@@ -20,13 +20,13 @@ cp .env.sample .env
 npm start
 ```
 ## 명령어
-- 카뎃 클러스태 내 위치 조회  
+- 클러스태 내 카뎃의 위치를 조회합니다.  
   `/{botName} where {intra_id}`
-- 지원금 수령 가능여부 조회  
+- 해당 카뎃의 지원금 수령 가능여부 조회합니다.
   `/{botName} salary {intra_id}`
-- 문의에일 링크  
+- 문의에일 주소를 받습니다.
   `/{botName} mail`
-- README LINK  
+- bot 사용법에 대한 내용을 조회합니다.  
   `/{botName} help`
 ### 파일목록
 - index.js
