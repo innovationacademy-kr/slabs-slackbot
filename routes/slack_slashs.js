@@ -16,8 +16,10 @@ router.post('/', async (req, res, next) => {
 
   // TODO api 선택해서 적용할 수 있도록 각 API에 대한 객체 생성
   const userData = await useApi42.run(res, body.text);
-
+  if (userData === undefined)
+    return;
   let result;
+  // FIXME cmdKey??? 무슨일?? 전역?
   const slackCmd = await useApi42.getCommand(cmdKey);
   if (typeof slackCmd === 'function') {
     result = await slackCmd(userData, channelId);

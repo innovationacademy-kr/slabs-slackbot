@@ -23,6 +23,7 @@ const getUserData = async (res, uriPart, channelId) => {
   try {
     userData = await api42.getUserData(uriPart);
   } catch (err) {
+    /*
     const error = new Error("[user.js] getUserData: " + err.message);
     error.status = (err.response) ? err.response.status : 500;
     if (error.status === 401) {
@@ -35,6 +36,8 @@ const getUserData = async (res, uriPart, channelId) => {
     }
     postMessageToSlack(message, channelId);
     //return;
+  */
+    return;
   }
   return userData;
 }
@@ -67,7 +70,8 @@ const useApi42 = {
     }
     const uriPart = await getUriPart(cmdKey, userName);
     const userData = await getUserData(res, uriPart, channelId);
-    userData.login = userName;
+    if (userData !== undefined)
+      userData.login = userName;
     return userData;
   }
 }
