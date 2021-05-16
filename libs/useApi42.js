@@ -66,7 +66,8 @@ const useApi42 = {
     if (this.isApiCommand(cmdKey) === false)
     {
         console.log(`Error: ${cmdKey} is not cmd in 42API!`);
-        res.sendStatus(200, '없는 명령어입니다.').send('404');
+        res.status(200).send('없는 명령어입니다.');
+        return;
     }
     const uriPart = await getUriPart(cmdKey, userName);
     const userData = await getUserData(res, uriPart, channelId);
