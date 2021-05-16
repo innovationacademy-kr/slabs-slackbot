@@ -36,7 +36,7 @@ const api42 = {
     const response = await axios.all([axios42(token).get(useUri).catch(async function (error){
       console.log("reserror", error.response.status);
       if (error.response.status == 401)
-        await setToken();
+        token = '';
     })]);
     ret = { ...response[0].data };
     return ret;
