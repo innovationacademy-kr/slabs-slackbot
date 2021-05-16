@@ -22,11 +22,8 @@ router.post('/', async (req, res, next) => {
   // FIXME cmdKey??? 무슨일?? 전역?
   const slackCmd = await useApi42.getCommand(cmdKey);
   if (typeof slackCmd === 'function') {
+    await res.status(200).send('');
     result = await slackCmd(userData, channelId);
-    res.sendStatus(200, '');
-  } else {
-    result = '🤖Hmm... but don’t panic!';
-    res.sendStatus(200, 'Error: slash command error.');
   }
 });
 
