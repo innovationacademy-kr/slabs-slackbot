@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
+const postMessageToSlack = require('../common/postMessageToSlack');
 
 const bodyParser = require('body-parser');
 router.use(bodyParser.json());
@@ -8,56 +9,42 @@ router.use(bodyParser.urlencoded({
   extended: true
 }));
 
-const getUserData = require('../libs/getUserData');
-const slashCommands = require('../libs/slashCommands');
+const useApi42 = require('../libs/useApi42');
+const useApiNone = require('../libs/useApiNone');
 
-const getApi42UriPart = function (cmdKey, username) {
-  let uriPart
-  const partA = ['where'];
-  const partB = ['salary'];
-
-  if (partA.includes(cmdKey))
-    uriPart = `/users/${username}`;
-  else if (partB.includes(cmdKey))
-    uriPart = `/users/${username}/coalitions_users`;
-  else
-    uriPart = null;
-  return uriPart;
-}
-
-const getSlackCommand = function(cmdKey) {
-  const cmdMap = {
-    'where': slashCommands.where,
-    'salary': slashCommands.salary,
+// NOTE API를 미리 구분
+async function classifyApi(cmdKey) {
+  if (useApi42.isApiCommand(cmdKey)) {
+    return (useApi42);
+  } else if (useApiNone.isApiCommand(cmdKey)) {
+    return (useApiNone);
+  } else {
+    return (undefined);
   }
-  return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
 }
+
 
 router.post('/', async (req, res, next) => {
   const body = req.body;
   const channelId = body.channel_id;
 
-  const tmpStrArr = body.text.split(' ', 2);
-  [cmdKey, username] = [tmpStrArr[0], tmpStrArr[1]];
-  console.log("cmdKey: ", cmdKey, "username: ", username);
+  const cmdKey = body.text.split(' ', 1)[0];
 
-  let uriPart;
-  uriPart = await getApi42UriPart(cmdKey, username);
-  if (!uriPart) {
-    res.sendStatus(200, '없는 명령어입니다.').send('404');
+  const apiType = await classifyApi(cmdKey);
+  if (typeof apiType !== 'object') {
+    await res.status(404).send('');
+    postMessageToSlack("잘못된 명령어를 입력하셨습니다.", channelId);
     return ;
   }
-  const userData = await getUserData(res, uriPart, channelId);
 
-  let result;
-  const slackCmd = getSlackCommand(cmdKey);
-  if (typeof slackCmd === 'function') {
-    result = await slackCmd(userData, channelId);
-    res.sendStatus(200, '');
-  } else {
-    result = '🤖Hmm... but don’t panic!';
-    res.sendStatus(200, 'Error: slash command error.');
-  }
+  // TODO api 선택해서 적용할 수 있도록 각 API에 대한 객체 생성
+  const userData = await apiType.run(res, body);
+  if (userData === undefined)
+    return;
+
+  const slackCmd = await apiType.getCommand(cmdKey);
+  result = await slackCmd(userData, channelId);
+  await res.status(200).send('');
 });
 
 module.exports = router;

@@ -4,6 +4,8 @@ const session = require('express-session');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 const logger = require('morgan');
+let token = '';
+global.token = token;
 
 const app = express();
 
@@ -24,6 +26,10 @@ app.use(session({
 
 app.use('/slack/events', slackEventRouter);
 app.use('/slack/slashs', slackSlashRouter);
+
+app.get('/', (req, res, next) => {
+  next(new Error('custom Error'));
+});
 
 app.use((err, req, res, next) => {
   console.error(err);
