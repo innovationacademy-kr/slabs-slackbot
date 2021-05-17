@@ -27,6 +27,10 @@ app.use(session({
 app.use('/slack/events', slackEventRouter);
 app.use('/slack/slashs', slackSlashRouter);
 
+app.get('/', (req, res, next) => {
+  next(new Error('custom Error'));
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(404).send('Not Found');

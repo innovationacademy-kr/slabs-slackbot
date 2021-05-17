@@ -23,6 +23,7 @@ const getUserData = async (res, uriPart, channelId) => {
   try {
     userData = await api42.getUserData(uriPart);
   } catch (err) {
+    // FIXME message, channelId가 없는 경우 처리
     /*
     const error = new Error("[user.js] getUserData: " + err.message);
     error.status = (err.response) ? err.response.status : 500;

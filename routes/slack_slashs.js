@@ -43,13 +43,6 @@ router.post('/', async (req, res, next) => {
   const slackCmd = await apiType.getCommand(cmdKey);
   result = await slackCmd(userData, channelId);
   await res.status(200).send('');
-  // FIXME 앞에서 이미 slcak command를 필터링
-  /*
-  if (typeof slackCmd === 'function') {
-    await res.status(200).send('');
-    result = await slackCmd(userData, channelId);
-  }
-  */
 });
 
 module.exports = router;
