@@ -36,7 +36,7 @@ router.post('/', async (req, res, next) => {
   }
 
   // TODO api 선택해서 적용할 수 있도록 각 API에 대한 객체 생성
-  const userData = await apiType.run(res, body.text);
+  const userData = await apiType.run(res, body);
   if (userData === undefined)
     return;
 
