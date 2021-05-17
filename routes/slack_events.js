@@ -6,8 +6,6 @@ const { WebClient } = require('@slack/web-api');
 const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token); 
 
-const api42 = require('../services/api42');
-
 const getEventCallBackResponse = async (event) => {
   if (event.type === 'message') {
     if(event.text === '안녕') {
@@ -26,7 +24,6 @@ router.post('/', async (req, res, next) => {
   let body = req.body;
   let event = body.event;
 
-  //const userInfo = await userService.getUserData(username);
   if (body.type === 'event_callback') {
     getEventCallBackResponse(event);
     res.sendStatus(200);
