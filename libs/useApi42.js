@@ -52,6 +52,7 @@ const useApi42 = {
     return true;
   },
   getCommand: function(cmdKey) {
+    console.log(cmdKey);
     const cmdMap = {
       'where': api42Commands.where,
       'salary': api42Commands.salary,
@@ -61,7 +62,8 @@ const useApi42 = {
   run: async function (res, bodyText) {
     const channelId = bodyText.chnnel_id;
     const tmpStrArr = bodyText.split(' ', 2);
-    [cmdKey, userName] = [tmpStrArr[0], tmpStrArr[1]];
+    const cmdKey = tmpStrArr[0];
+    const userName = tmpStrArr[1];
 
     if (this.isApiCommand(cmdKey) === false)
     {
