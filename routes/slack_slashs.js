@@ -9,18 +9,20 @@ router.use(bodyParser.urlencoded({
   extended: true
 }));
 
+const useApi42 = require('../libs/useApi42');
+const useApiNone = require('../libs/useApiNone');
+
 // NOTE API를 미리 구분
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
     return (useApi42);
-  //} else if (useApiNone.isApiCommand()) {
-  //  return (undefined);
+  } else if (useApiNone.isApiCommand(cmdKey)) {
+    return (useApiNone);
   } else {
     return (undefined);
   }
 }
 
-const useApi42 = require('../libs/useApi42');
 
 router.post('/', async (req, res, next) => {
   const body = req.body;
