@@ -23,21 +23,8 @@ const getUserData = async (res, uriPart, channelId) => {
   try {
     userData = await api42.getUserData(uriPart);
   } catch (err) {
-    /*
-    const error = new Error("[user.js] getUserData: " + err.message);
-    error.status = (err.response) ? err.response.status : 500;
-    if (error.status === 401) {
-      res.status(200).send('401');
-      message = '요청 시간 초과..';
-    } else if (error.status === 404) {
-      res.status(200).send('404');
-      message = '아이디를 바르게 입력 바랍니다..';
-      //return;
-    }
-    postMessageToSlack(message, channelId);
-    //return;
-  */
-    return;
+    postMessageToSlack("아이디를 바르게 입력하시기 바랍니다.", channelId);
+    res.status(404).send('');
   }
   return userData;
 }
@@ -59,8 +46,9 @@ const useApi42 = {
     }
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
   },
-  run: async function (res, bodyText) {
-    const channelId = bodyText.chnnel_id;
+  run: async function (res, body) {
+    const bodyText = body.text;
+    const bodyChannelId = body.channel_id;
     const tmpStrArr = bodyText.split(' ', 2);
     const cmdKey = tmpStrArr[0];
     const userName = tmpStrArr[1];
@@ -72,7 +60,7 @@ const useApi42 = {
         return;
     }
     const uriPart = await getUriPart(cmdKey, userName);
-    const userData = await getUserData(res, uriPart, channelId);
+    const userData = await getUserData(res, uriPart, bodyChannelId);
     if (userData !== undefined)
       userData.login = userName;
     return userData;

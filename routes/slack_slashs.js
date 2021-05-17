@@ -36,20 +36,13 @@ router.post('/', async (req, res, next) => {
   }
 
   // TODO api 선택해서 적용할 수 있도록 각 API에 대한 객체 생성
-  const userData = await apiType.run(res, body.text);
+  const userData = await apiType.run(res, body);
   if (userData === undefined)
     return;
 
   const slackCmd = await apiType.getCommand(cmdKey);
   result = await slackCmd(userData, channelId);
   await res.status(200).send('');
-  // FIXME 앞에서 이미 slcak command를 필터링
-  /*
-  if (typeof slackCmd === 'function') {
-    await res.status(200).send('');
-    result = await slackCmd(userData, channelId);
-  }
-  */
 });
 
 module.exports = router;
