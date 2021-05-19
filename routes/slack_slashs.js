@@ -35,9 +35,10 @@ router.post('/', async (req, res, next) => {
     return ;
   }
 
+  console.log(res);
   const apiData = await apiType.run(res, body);
-  // if (apiData === undefined)
-  //   return;
+  if (apiData === undefined)
+    return;
   const slackCmd = await apiType.getCommand(cmdKey);
   result = await slackCmd(apiData, channelId);
   await res.status(200).send(result);
