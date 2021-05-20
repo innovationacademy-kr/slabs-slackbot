@@ -22,7 +22,9 @@ const useApiNone = {
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
   },
   run: async function (res, body) {
-    const apiNoneData = body.text.split(' ')[1];
+    let apiNoneData = body.text.split(' ')[1];
+    if (apiNoneData === undefined)
+      return "empty string";
     return apiNoneData;
   }
 }
