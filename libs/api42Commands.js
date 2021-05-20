@@ -27,7 +27,7 @@ const api42Commands = {
       message = `${userLogin}님 ${userScore}점 입니다..\n지원금 수령 불가능 합니다.`;
       console.log(`=====${userScore}점... 지원금 수령 불가=====`);
     }
-    postMessageToSlack(message, channelId);
+    return (message);
   }
 }
 
