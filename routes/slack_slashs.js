@@ -12,6 +12,7 @@ router.use(bodyParser.urlencoded({
 const useApi42 = require('../libs/useApi42');
 const useApiNone = require('../libs/useApiNone');
 
+
 // NOTE API를 미리 구분
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
@@ -34,8 +35,6 @@ router.post('/', async (req, res, next) => {
     postMessageToSlack("잘못된 명령어를 입력하셨습니다.", channelId);
     return ;
   }
-
-  console.log(res);
   const apiData = await apiType.run(res, body);
   if (apiData === undefined)
     return;

@@ -18,6 +18,9 @@ app.use(express.json());
 //app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser());
 
+const db = require('./models');
+const { Suggestion } = require('./models');
+
 app.use(session({
   resave: false,
   saveUninitialized: true,
@@ -28,7 +31,12 @@ app.use('/slack/events', slackEventRouter);
 app.use('/slack/slashs', slackSlashRouter);
 
 app.get('/', (req, res, next) => {
-  next(new Error('custom Error'));
+  Suggestion.findAll().then((users) => {
+    res.send(users)
+  }).catch((err) => {
+    console.log("err");
+  });
+  next();
 });
 
 app.use((err, req, res, next) => {
@@ -36,6 +44,8 @@ app.use((err, req, res, next) => {
   res.status(404).send('Not Found');
 })
 
-app.listen(PORT, () => {
-  console.log(`Listening on ${ PORT }`)
+db.sequelize.sync().then((req) => {
+  app.listen(PORT, () => {
+    console.log(`Listening on ${ PORT }`)
+  });
 });

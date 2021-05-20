@@ -2,7 +2,7 @@ const apiNoneCommands = require('./apiNoneCommands');
 const postMessageToSlack = require('../common/postMessageToSlack');
 
 // TODO 새로운 함수가 추가될 때마다 파일로 관리해서 기입하는 방식으로
-const partA = ['help', 'mail', 'request'];
+const partA = ['help', 'mail', 'suggest'];
 
 const useApiNone = {
   isApiCommand: function(cmdKey) {
@@ -17,14 +17,17 @@ const useApiNone = {
     const cmdMap = {
       'help': apiNoneCommands.help,
       'mail': apiNoneCommands.mail,
-      'request': apiNoneCommands.request,
+      'suggest': apiNoneCommands.suggest,
     }
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
   },
   run: async function (res, body) {
-    let apiNoneData = body.text.split(' ')[1];
-    if (apiNoneData === undefined)
+    //let apiNoneData = body.text.split(' ')[1];
+    let apiNoneData = body.text;
+    const tmpIdx = apiNoneData.indexOf(' ');
+    if (tmpIdx < 0)
       return "empty string";
+    apiNoneData = apiNoneData.substr(tmpIdx);
     return apiNoneData;
   }
 }
