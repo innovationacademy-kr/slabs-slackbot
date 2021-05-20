@@ -2,7 +2,6 @@ const api42 = require('../services/api42');
 const api42Commands = require('./api42Commands');
 const postMessageToSlack = require('../common/postMessageToSlack');
 
-// TODO 새로운 함수가 추가될 때마다 파일로 관리해서 기입하는 방식으로
 const partA = ['where'];
 const partB = ['salary'];
 
@@ -16,17 +15,6 @@ const getUriPart = async (cmdKey, userName) => {
     res.sendStatus(200, '없는 명령어입니다.').send('404');
   }
   return uriPart
-}
-
-const getUserData = async (res, uriPart, channelId) => {
-  let userData;
-  try {
-    userData = await api42.getUserData(uriPart);
-  } catch (err) {
-    postMessageToSlack("아이디를 바르게 입력하시기 바랍니다.", channelId);
-    res.status(404).send('');
-  }
-  return userData;
 }
 
 const useApi42 = {
@@ -50,17 +38,16 @@ const useApi42 = {
     const bodyText = body.text;
     const bodyChannelId = body.channel_id;
     const tmpStrArr = bodyText.split(' ', 2);
-    const cmdKey = tmpStrArr[0];
-    const userName = tmpStrArr[1];
+    const [cmdKey, userName] = [tmpStrArr[0], tmpStrArr[1]];
 
-    if (this.isApiCommand(cmdKey) === false)
-    {
-        console.log(`Error: ${cmdKey} is not cmd in 42API!`);
-        res.status(200).send('없는 명령어입니다.');
-        return;
-    }
     const uriPart = await getUriPart(cmdKey, userName);
-    const userData = await getUserData(res, uriPart, bodyChannelId);
+    let userData;
+    try {
+      userData = await api42.getUserData(uriPart);
+    } catch (err) {
+      userData = undefined;
+      res.status(200).send("👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ");
+    }
     if (userData !== undefined)
       userData.login = userName;
     return userData;
