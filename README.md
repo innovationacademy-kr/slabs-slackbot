@@ -1,4 +1,22 @@
-# Slack bot
+# 42vin
+## 명령어
+- 클러스터 내 카뎃의 위치를 조회합니다.  
+  `/bot where {intra_id}`
+- 코알리숑 포인트를 조회합니다.  
+  `/bot salary {intra_id}`
+- 문의메일 주소를 받습니다.  
+  `/bot mail`
+- bot 사용법에 대한 내용을 조회합니다.  
+  `/bot help`
+- 운영팀에게 기능 추가를 건의합니다.  
+  `/bot suggest {건의할 내용(띄어쓰기 사용가능)}`
+- 식사 메뉴를 정해 줍니다.  
+  `/bot menu`
+- 비밀(?)을 알려 줍니다.  
+  `/bot secret`
+- 로또 번호를 무작위 추첨해 줍니다.  
+  `/bot lotto`  
+
 ## 42 API app 및 Slack API 봇 생성하기
 ### intra 42에서 앱등록하기(UID, SECRET, REDIRECT URI 받기)
   - [42 intra API application page](https://profile.intra.42.fr/oauth/applications)
@@ -25,31 +43,10 @@ cp .env.sample .env
 npm start
 ```
 
-## 명령어
-- 클러스터 내 카뎃의 위치를 조회합니다.
-  `/bot where {intra_id}`
-- 코알리숑 포인트를 조회합니다.
-  `/bot salary {intra_id}`
-- 문의메일 주소를 받습니다.
-  `/bot mail`
-- bot 사용법에 대한 내용을 조회합니다.
-  `/bot help`
-- 식사 메뉴를 정해 줍니다.
-  `/bot menu`
-- 비밀(?)을 알려 줍니다.
-  `/bot secret`
-- 로또 번호를 무작위 추첨해 줍니다.
-  `/bot lotto`
-
-
-# slabs-slackbot
-Software Labs Slackbot
-
-## Wiki
+## Reference
+### Wiki
 https://github.com/innovationacademy-kr/slabs-slackbot/wiki
-
-## project process
+### project process
 https://docs.google.com/document/d/14dmZbaVGoxXbMZtK8UFjqoHdiIOVUmBIH3-m-oGbrt0/edit
-
-## Repository
+### Repository
 https://github.com/innovationacademy-kr/slabs-slackbot
