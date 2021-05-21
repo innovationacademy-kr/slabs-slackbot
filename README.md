@@ -26,14 +26,21 @@ npm start
 ```
 
 ## 명령어
-- 클러스태 내 카뎃의 위치를 조회합니다.
-  `/{botName} where {intra_id}`
-- 해당 카뎃의 지원금 수령 가능여부 조회합니다.
-  `/{botName} salary {intra_id}`
-- 문의에일 주소를 받습니다.
-  `/{botName} mail`
+- 클러스터 내 카뎃의 위치를 조회합니다.
+  `/bot where {intra_id}`
+- 코알리숑 포인트를 조회합니다.
+  `/bot salary {intra_id}`
+- 문의메일 주소를 받습니다.
+  `/bot mail`
 - bot 사용법에 대한 내용을 조회합니다.
-  `/{botName} help`
+  `/bot help`
+- 식사 메뉴를 정해 줍니다.
+  `/bot menu`
+- 비밀(?)을 알려 줍니다.
+  `/bot secret`
+- 로또 번호를 무작위 추첨해 줍니다.
+  `/bot lotto`
+
 
 # slabs-slackbot
 Software Labs Slackbot

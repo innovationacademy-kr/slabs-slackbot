@@ -1,34 +1,32 @@
-require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 const logger = require('morgan');
+const db = require('./models');
+const { Suggestion } = require('./models');
+const helmet = require('helmet');
+const app = express();
+
+require('dotenv').config();
 let token = '';
 global.token = token;
 
-const app = express();
-
-const slackEventRouter = require('./routes/slack_events');
-const slackSlashRouter = require('./routes/slack_slashs');
-
+app.use(helmet());
+app.use('/slack/events', require('./routes/slack_events'));
+app.use('/slack/slashs', require('./routes/slack_slashs'));
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-//app.use(express.urlencoded({ extended: false }));
-//app.use(cookieParser());
-
-const db = require('./models');
-const { Suggestion } = require('./models');
-
+/*
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+*/
 app.use(session({
   resave: false,
   saveUninitialized: true,
   secret: process.env.SECRET
 }));
-
-app.use('/slack/events', slackEventRouter);
-app.use('/slack/slashs', slackSlashRouter);
 
 app.get('/', (req, res, next) => {
   Suggestion.findAll().then((users) => {
