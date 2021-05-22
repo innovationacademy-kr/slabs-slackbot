@@ -43,6 +43,7 @@ const useApi42 = {
     const uriPart = await getUriPart(cmdKey, userName);
     let userData;
     try {
+      await res.status(200).send('');
       userData = await api42.getUserData(uriPart);
     } catch (err) {
       userData = undefined;
