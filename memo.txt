@@ -1,5 +1,0 @@
-Error시 체크해야할 사항
-- ngrok이 잘 돌아가고 있는지
-- 인증받은 slack token이 .env 파일에 기입한 token과 같은지
-  (slack API Event Subscription에서 확인가능)
-- 
