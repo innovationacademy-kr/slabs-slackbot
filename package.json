@@ -18,13 +18,18 @@
     "cookie-parser": "^1.4.5",
     "dayjs": "^1.10.4",
     "dotenv": "^9.0.1",
-    "ejs": "^3.1.5",
+    "ejs": "^3.1.6",
     "express": "^4.15.2",
     "express-session": "^1.17.1",
+    "helmet": "^4.6.0",
+    "mariadb": "^2.5.3",
     "morgan": "^1.10.0",
+    "mysql2": "^2.2.5",
     "nodemon": "^2.0.7",
     "passport": "^0.4.1",
-    "passport-42": "^1.2.6"
+    "passport-42": "^1.2.6",
+    "sequelize": "^6.6.2",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "got": "^11.3.0",

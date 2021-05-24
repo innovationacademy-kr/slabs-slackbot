@@ -1,53 +1,36 @@
 require('dotenv').config();
+const express = require('express');
+const router = express.Router();
+const { Suggestion } = require('../models');
 
-var express = require('express');
-var router = express.Router();
+const bodyParser = require('body-parser');
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({
+  extended: true
+}));
 
-const passport = require('passport');
-const FortyTwoStrategy = require('passport-42').Strategy;
-//const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
-
-passport.use(new FortyTwoStrategy({
-  clientID: process.env.FORTYTWO_CLIENT_ID,
-  clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
-  callbackURL: process.env.RETURN_URL,
-  passReqToCallback: true,
-},
-  function (req, accessToken, refreshToken, profile, cb) {
-    req.session.accessToken = accessToken;
-    req.session.refreshToken = refreshToken;
-    console.log('accessToken', accessToken, 'refreshToken', refreshToken);
-    return cb(null, profile);
-  }));
-passport.serializeUser(function (user, cb) {
-  cb(null, user);
-});
-
-passport.deserializeUser(function (obj, cb) {
-  cb(null, obj);
-});
-router.use(passport.initialize());
-router.use(passport.session());
-
-/* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('index', { title: '42Seoul Info', user: req.user });
+  res.render('index', { title: "42vin" });
 });
 
-router.get('/login/42',
-  passport.authenticate('42')
-);
-
-router.get('/login/42/return',
-  passport.authenticate('42', { failureRedirect: '/login' }),
-  function (req, res) {
-    res.redirect('/');
-  }
-);
-
-router.get('/logout', function (req, res) {
-  req.logout();
-  res.redirect('/');
+router.get('/suggestions', async function (req, res, next) {
+  let suggestionsData = new Array;
+  await Suggestion.findAll().then((data) => {
+      console.log("Suggestions database called");
+      let i = 0;
+      while (data[i]) {
+        const content = data[i].dataValues.content;
+        suggestionsData.push(content);
+        ++i;
+      }
+    }).catch((err) => {
+      console.log("Sequelize selection err");
+      next(err);
+    });
+  res.status(200).render('../views/suggestions', {
+    title: `Suggestions`,
+    data: suggestionsData,
+  });
 });
 
 module.exports = router;

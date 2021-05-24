@@ -21,23 +21,25 @@ const getClientCredentials = oauth.client(axios.create(), {
   client_secret: process.env.FORTYTWO_CLIENT_SECRET,
   scope: 'public'
 });
+
 const setToken = async function(){
   const clientCredentials = await getClientCredentials();
   const tmp = {...clientCredentials};
   token = tmp.access_token;
   console.log("new token",token);
 };
+
 const api42 = {
   getUserData: async function (uriPart) {
-    if (token == '')
-      await setToken()
-    console.log(token);
     useUri = `${END_POINT_42_API}/v2/${uriPart}`;
-    const response = await axios.all([axios42(token).get(useUri).catch(async function (error){
-      console.log("reserror", error.response.status);
+    let response = await axios.all([axios42(token).get(useUri).catch(async function (error){
       if (error.response.status == 401)
         token = '';
     })]);
+    if (token == ''){
+      await setToken();
+      response = await axios.all([axios42(token).get(useUri)]);
+    }
     ret = { ...response[0].data };
     return ret;
   }
