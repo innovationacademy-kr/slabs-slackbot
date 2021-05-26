@@ -2,6 +2,7 @@
 const { Suggestion } = require('../models');
 const NumberUtils = require('../common/NumberUtils');
 const ArrayUtils = require('../common/ArrayUtils');
+const commandManual = require('../docs/commandManual');
 
 // TODO command 각각에 대한 파일을 나눠서 require 하는 방식으로 (api 폴더 나누기)
 const apiNoneCommands = {
@@ -16,7 +17,7 @@ const apiNoneCommands = {
   suggest : async function(apiData, channelId) {
     let message;
     if (apiData === "empty string") {
-      message = "요청사항을 적어주세요.";
+      message = "📭 요청 사항이 입력되지 않았어요..🌝\n너무 완벽한건가 hoxy 🏖";
     } else {
       Suggestion.create({
         content: `${apiData}`
@@ -25,7 +26,7 @@ const apiNoneCommands = {
           console.log(err);
         }
       })
-      message = "요청이 잘 전달 되었습니다.";
+      message = "📬 빠른 시일내에⏳ 구현하도록💻 노력해보겠습니다! 감사합니다🤓";
     }
     return (message);
   },
