@@ -1,4 +1,3 @@
-//const { User } = require('../models');
 const { Suggestion } = require('../models');
 const NumberUtils = require('../common/NumberUtils');
 const ArrayUtils = require('../common/ArrayUtils');
@@ -10,10 +9,19 @@ const apiNoneCommands = {
     const message = "born2code@42seoul.kr";
     return (message);
   },
-  help : async function(apiData, channelId) {
+  github : async function(apiData, channelId) {
     const message = "https://github.com/innovationacademy-kr/slabs-slackbot";
     return (message);
   },
+  help : async function(apiData, channelId) {
+    let resultEntries = Object.entries(commandManual)
+    let message = "";
+    for (let[key, value] of resultEntries) {
+      message += `${key}\n${value}\n\n`;
+    }
+    console.log(message);
+    return (message);
+  }, 
   suggest : async function(apiData, channelId) {
     let message;
     if (apiData === "empty string") {
