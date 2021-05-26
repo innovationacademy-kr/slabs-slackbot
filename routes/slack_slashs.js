@@ -5,15 +5,13 @@ const postMessageToSlack = require('../common/postMessageToSlack');
 
 const bodyParser = require('body-parser');
 router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({
-  extended: true
-}));
+router.use(bodyParser.urlencoded({ extended: true }));
 
 const useApi42 = require('../libs/useApi42');
 const useApiNone = require('../libs/useApiNone');
 
 
-// NOTE API를 미리 구분
+// NOTE 사용할 API 구분
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
     return (useApi42);
@@ -32,7 +30,7 @@ router.post('/', async (req, res, next) => {
   const apiType = await classifyApi(cmdKey);
   if (typeof apiType !== 'object') {
     await res.status(404).send('');
-    postMessageToSlack("잘못된 명령어를 입력하셨습니다.", channelId);
+    postMessageToSlack("🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩", channelId);
     return ;
   }
   const apiData = await apiType.run(res, body);
