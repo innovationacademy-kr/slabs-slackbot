@@ -15,6 +15,27 @@ const api42Commands = {
     }
     return (message);
   },
+  blackhole: async function(userData, channelId) {
+    let message;
+    const userLogin = userData.login;
+
+    const absorptionDate = new Date(userData.cursus_users[1].blackholed_at);
+    const todayDate = new Date();
+    restOfDay = await Math.floor((absorptionDate - todayDate) / 1000 / 60 / 60 / 24);
+
+    if (restOfDay > 100) {
+      message = `🤖 ${userLogin}님은 블랙홀이 ${restOfDay}일❕ 남았어요☀ ️`
+    } else if (restOfDay > 50) {
+      message = `🤖 ${userLogin}님은 블랙홀이 ${restOfDay}일❕ 남았어요 🌏`
+    } else if (restOfDay > 30) {
+      message = `🤖 ${userLogin}님은 블랙홀이 ${restOfDay}일❕ 남았어요 🪐`
+    } else if (restOfDay > 10) {
+      message = `🤖 ${userLogin}님은 진정한 블랙홀 피시너!\n▶️${restOfDay}일❗️ 남았어요 🏄‍♂️`;
+    } else if (restOfDay >= 0) {
+      message = `🤖 ${userLogin}님급할수록! 서둘러요.. 파이팅 파이팅 🤞\n▶️${restOfDay}일❗️ 남았어요 🌚`
+    }
+    return (message);
+  },
   salary: async function(userData, channelId) {
     let message;
     let userScore = 0;
