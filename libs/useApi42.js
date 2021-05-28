@@ -2,7 +2,7 @@ const api42 = require('../services/api42');
 const api42Commands = require('./api42Commands');
 const postMessageToSlack = require('../common/postMessageToSlack');
 
-const partA = ['where'];
+const partA = ['where', 'blackhole'];
 const partB = ['salary'];
 
 const getUriPart = async (cmdKey, userName) => {
@@ -30,6 +30,7 @@ const useApi42 = {
     console.log(cmdKey);
     const cmdMap = {
       'where': api42Commands.where,
+      'blackhole': api42Commands.blackhole,
       'salary': api42Commands.salary,
     }
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;

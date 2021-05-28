@@ -2,7 +2,7 @@ const apiNoneCommands = require('./apiNoneCommands');
 const postMessageToSlack = require('../common/postMessageToSlack');
 
 // TODO 새로운 함수가 추가될 때마다 파일로 관리해서 기입하는 방식으로
-const partA = ['help', 'mail', 'suggest', 'lotto', 'menu', 'secret'];
+const partA = ['help', 'mail', 'github','suggest', 'lotto', 'menu', 'secret'];
 
 const useApiNone = {
   isApiCommand: function(cmdKey) {
@@ -17,6 +17,7 @@ const useApiNone = {
     const cmdMap = {
       'help': apiNoneCommands.help,
       'mail': apiNoneCommands.mail,
+      'github': apiNoneCommands.github,
       'suggest': apiNoneCommands.suggest,
       'lotto' : apiNoneCommands.lotto,
       'menu' : apiNoneCommands.menu,
