@@ -15,7 +15,6 @@ const { Suggestion } = require('./models');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// FIXME 언제 쓰는건가요?
 global.token = '';
 
 app.use(session({
