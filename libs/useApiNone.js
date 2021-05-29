@@ -8,7 +8,6 @@ const useApiNone = {
   isApiCommand: function(cmdKey) {
     const partAll = [...partA];
     if (partAll.includes(cmdKey) === false) {
-      console.log("None :" + cmdKey, " is not key in nonAPI");
       return false;
     }
     return true;

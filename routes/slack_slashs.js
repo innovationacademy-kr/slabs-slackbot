@@ -17,28 +17,28 @@ async function classifyApi(cmdKey) {
     return (useApi42);
   } else if (useApiNone.isApiCommand(cmdKey)) {
     return (useApiNone);
-  } else {
-    return (undefined);
   }
+  return ("🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩");
 }
 
 router.post('/', async (req, res, next) => {
-  const body = req.body;
-  const channelId = body.channel_id;
-  const cmdKey = body.text.split(' ', 1)[0];
+  const { body } = req;
+  const { channel_id: channelId } = body;
+  const [cmdKey] = body.text.split(' ', 1);
 
   const apiType = await classifyApi(cmdKey);
-  if (typeof apiType !== 'object') {
-    await res.status(404).send('');
-    postMessageToSlack("🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩", channelId);
+  if (typeof apiType != 'object') {
+    res.status(200).send(apiType);
     return ;
   }
-  const apiData = await apiType.run(res, body);
-  if (apiData === undefined)
-    return;
-  const slackCmd = await apiType.getCommand(cmdKey);
-  result = await slackCmd(apiData, channelId);
-  await res.status(200).send(result);
+  try {
+    const apiData = await apiType.run(res, body);
+    const slackCmd = await apiType.getCommand(cmdKey);
+    result = await slackCmd(apiData, channelId);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(200).send(error);
+  }
 });
 
 module.exports = router;
