@@ -2,7 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
 
-const TOKEN_REQUEST_TIME_OUT = 4000;
+const TOKEN_REQUEST_TIME_OUT = 5000;
 const END_POINT_42_API = "https://api.intra.42.fr";
 
 const axios42 = function (accessToken) {
