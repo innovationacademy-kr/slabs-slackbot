@@ -36,19 +36,18 @@ const useApi42 = {
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
   },
   run: async function (res, body) {
-    const bodyText = body.text;
-    const bodyChannelId = body.channel_id;
-    const tmpStrArr = bodyText.split(' ', 2);
-    const [cmdKey, userName] = [tmpStrArr[0], tmpStrArr[1]];
+    const {text: bodyText, channel_id: bodyChannelId} = body;
+    const [cmdKey, userName] = bodyText.split(' ', 2);
 
     const uriPart = await getUriPart(cmdKey, userName);
     let userData;
     try {
-      await res.status(200);
+      res.status(200); //.send("👻 42 api 요청시간이 초과되었습니다 ㅠㅠ");
       userData = await api42.getUserData(uriPart);
     } catch (err) {
       userData = undefined;
-      res.status(200).send("👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ");
+      res.status(200); //.send("👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ");
+      return userData;
     }
     if (userData !== undefined)
       userData.login = userName;

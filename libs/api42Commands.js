@@ -24,18 +24,19 @@ const api42Commands = {
     restOfDay = await Math.floor((absorptionDate - todayDate) / 1000 / 60 / 60 / 24);
 
     if (restOfDay > 100) {
-      message = `🤖 ${userLogin}님은 블랙홀이 ${restOfDay}일 남았어요☀ ️`
+      message = `✨ ${userLogin}님은 블랙홀이 ${restOfDay}일 남았어요☀ ️`
     } else if (restOfDay > 50) {
-      message = `🤖 ${userLogin}님은 블랙홀이 ${restOfDay}일 남았어요 🌏`
+      message = `✨ ${userLogin}님은 블랙홀이 ${restOfDay}일 남았어요 🌏`
     } else if (restOfDay > 30) {
-      message = `🤖 ${userLogin}님은 블랙홀이 ${restOfDay}일 남았어요 🪐`
+      message = `✨ ${userLogin}님은 블랙홀이 ${restOfDay}일 남았어요 🪐`
     } else if (restOfDay > 10) {
-      message = `🤖 ${userLogin}님은 진정한 블랙홀 피시너!\n️➡️ ${restOfDay}일 남았어요 🏄‍♂️`;
+      message = `✨ ${userLogin}님은 진정한 블랙홀 피시너!\n️➡️ ${restOfDay}일 남았어요 🏄‍♂️`;
     } else if (restOfDay >= 0) {
-      message = `🤖 ${userLogin}님 급할수록! 서둘러요.. 파이팅 파이팅 🤞\n➡️️ ${restOfDay}일️🙀 남았어요 🌚`
+      message = `✨ ${userLogin}님 급할수록! 서둘러요.. 파이팅 파이팅 🤞\n➡️️ ${restOfDay}일️🙀 남았어요 🌚`
     } else {
-      message = `🤖 ${userLogin}님은 좋은 카뎃이었습니다..:innocent:`
+      message = `✨ ${userLogin}님은 다른 멋진 곳에 계십니다! 🙌`
     }
+
     return (message);
   },
   salary: async function(userData, channelId) {
