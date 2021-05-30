@@ -9,7 +9,7 @@ const getToken = async function(){
   const clientCredentials = await getClientCredentials();
   const tmp = { ...clientCredentials };
   const token = tmp.access_token;
-  console.log("# token: ",token);
+  //console.log("# token: ",token);
   return token;
 };
 
