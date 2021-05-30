@@ -31,6 +31,7 @@ router.post('/', async (req, res, next) => {
     res.status(200).send(apiType);
     return ;
   }
+    
   try {
     const apiData = await apiType.getApiData(res, body);
     const slackCmd = await apiType.getCommand(cmdKey);

@@ -9,6 +9,7 @@ const getToken = async function(){
   const clientCredentials = await getClientCredentials();
   const tmp = { ...clientCredentials };
   const token = tmp.access_token;
+  //TODO 토큰 갱신주기 확인해보기
   //console.log("# token: ",token);
   return token;
 };
