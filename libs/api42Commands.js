@@ -4,13 +4,12 @@ const postMessageToSlack = require('../common/postMessageToSlack');
 const api42Commands = {
   where: async function(userData, channelId) {
     let message;
-    const { login: userLogin, location: userLocation} = userData;
-    if (userLocation) {
+    const { login: userLogin } = userData;
+    const { host: userLocation, begin_at, end_at } = userData['0'];
+    if (end_at == null) {
         message = `${userLogin}님이 ${userLocation}에 있습니다.`;
-    } else if (userLocation === null) {
-        message = `${userLogin}님이 자리에 없습니다.`;
     } else {
-        message = `Error: userLocation: ${userLocation}, userLogin: ${userLogin}`;
+        message = `${userLogin}님이 자리에 없습니다.`;
     }
     return (message);
   },
