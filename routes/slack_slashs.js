@@ -10,7 +10,6 @@ router.use(bodyParser.urlencoded({ extended: true }));
 const useApi42 = require('../libs/useApi42');
 const useApiNone = require('../libs/useApiNone');
 
-
 // NOTE 사용할 API 구분
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
@@ -24,7 +23,7 @@ async function classifyApi(cmdKey) {
 router.post('/', async (req, res, next) => {
   const { body } = req;
   const { channel_id: channelId } = body;
-  const [cmdKey] = body.text.split(' ', 1);
+  const [ cmdKey ] = body.text.split(' ', 1);
 
   const apiType = await classifyApi(cmdKey);
   if (typeof apiType != 'object') {
@@ -33,12 +32,12 @@ router.post('/', async (req, res, next) => {
   }
     
   try {
-    const apiData = await apiType.getApiData(res, body);
+    const apiData = await apiType.getApiData(req, res, body);
     const slackCmd = await apiType.getCommand(cmdKey);
     result = await slackCmd(apiData, channelId);
     res.status(200).send(result);
   } catch (error) {
-    res.status(200).send(error);
+    res.status(200).send(error.message);
   }
 });
 

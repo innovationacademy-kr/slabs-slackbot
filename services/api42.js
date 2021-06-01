@@ -1,6 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
+const { AccessToken } = require('../models');
 
 const TOKEN_REQUEST_TIME_OUT = 2500;
 const END_POINT_42_API = "https://api.intra.42.fr";
@@ -10,7 +11,7 @@ const getToken = async function(){
   const tmp = { ...clientCredentials };
   const token = tmp.access_token;
   //TODO 토큰 갱신주기 확인해보기
-  //console.log("# token: ",token);
+  console.log("# token: ",token);
   return token;
 };
 
@@ -32,20 +33,51 @@ const getClientCredentials = oauth.client(axios.create(), {
   scope: 'public'
 });
 
+const updateModel = async function (model, token) {
+  try {
+    model.update( {token: token}, {where: { id: '1' }})
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const api42 = {
-  getUserData: async function (res, uriPart) {
+  getUserData: async function (req, res, uriPart) {
     useUri = `${END_POINT_42_API}/v2/${uriPart}`;
-    const token = await getToken();
+
+    // req.session.token = await getToken();
+    // await AccessToken.create(
+    //   { token: req.session.token }
+    // ).catch((err) => {
+    //   console.log(err);
+    // })
+
+    const { token } = await AccessToken.findOne().then({where: {id: 1}});
+    req.session.token = token;
+    console.log("# token from database: ", token);
+    if (token === null) {
+      const newToken = await getToken();
+      console.log("# renew token", newToken);
+      await updateModel(AccessToken, newToken);
+      req.session.token = newToken;
+    }
+
     try {
-      const response = await axios.all([axios42(token).get(useUri)]);
+      const response = await axios.all([axios42(req.session.token).get(useUri)]);
       ret = { ...response[0].data };
       return ret;
     } catch (error) {
-      if (error.response) {
-        //console.log(error.response.data);
-        console.log("# axios42 error status: ", error.response.status);
-        // console.log(error.response.headers);
-      }
+      await updateModel(AccessToken, null);
+      //console.log(error.response.data);
+      console.log("# axios42 error status: ", error.response.status);
+      // console.log(error.response.headers);
+      // NOTE 42 API에서 찾지 못한 경우
+      // 1. 없는 intra id인 경우
+      // 2. token이 없는 경우
+      if (!req.session.token)
+        throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요🤗');
+      else
+        throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ');
     }
   }
 };
