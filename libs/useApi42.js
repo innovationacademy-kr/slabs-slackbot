@@ -2,20 +2,7 @@ const api42 = require('../services/api42');
 const api42Commands = require('./api42Commands');
 const PostMessageToSlack = require('../common/PostMessageToSlack');
 
-// const partA = ['where', 'blackhole'];
-// const partB = ['salary'];
 const commands = ['where', 'blackhole', 'salary'];
-
-/*
-const geturipart = async (cmdkey, username) => {
-  let uripart;
-  if (parta.includes(cmdkey))
-    uripart = `/users/${username}`;
-  else if (partb.includes(cmdkey))
-    uripart = `/users/${username}/coalitions_users`;
-  return uripart
-}
-*/
 
 const getUriPart = async (cmdKey, userName) => {
   const uriMap = {
@@ -25,18 +12,14 @@ const getUriPart = async (cmdKey, userName) => {
   }
   return (uriMap[cmdKey] ? uriMap[cmdKey] : undefined);
 }
-
 const useApi42 = {
   isApiCommand: function(cmdKey) {
-    //const partAll = [...partA, ...partB];
-    //if (partAll.includes(cmdKey) === false) {
     if (commands.includes(cmdKey) === false) {
       return false;
     } 
     return true;
   },
   getCommand: function(cmdKey) {
-    //console.log("# input command: ", cmdKey);
     const cmdMap = {
       'where': api42Commands.where,
       'blackhole': api42Commands.blackhole,
