@@ -44,17 +44,17 @@ const useApi42 = {
     }
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
   },
-  getApiData: async function (res, body) {
+  getApiData: async function (req, res, body) {
     const {text: bodyText, channel_id: bodyChannelId} = body;
     const [cmdKey, userName] = bodyText.split(' ', 2);
 
     const uriPart = await getUriPart(cmdKey, userName);
     try {
-      const userData = await api42.getUserData(res, uriPart);
+      const userData = await api42.getUserData(req, res, uriPart);
       userData.login = userName;
       return userData;
     } catch (error) {
-      throw new Error("👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ");
+      throw new Error(error);
     }
   }
 }
