@@ -1,6 +1,6 @@
 const api42 = require('../services/api42');
 const api42Commands = require('./api42Commands');
-const postMessageToSlack = require('../common/postMessageToSlack');
+const PostMessageToSlack = require('../common/PostMessageToSlack');
 
 // const partA = ['where', 'blackhole'];
 // const partB = ['salary'];

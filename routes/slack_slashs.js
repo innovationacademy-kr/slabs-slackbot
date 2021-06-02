@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const postMessageToSlack = require('../common/postMessageToSlack');
+const PostMessageToSlack = require('../common/PostMessageToSlack');
 
 const bodyParser = require('body-parser');
 router.use(bodyParser.json());
@@ -25,7 +25,7 @@ router.post('/', async (req, res, next) => {
   const { channel_id: channelId } = body;
   const [ cmdKey ] = body.text.split(' ', 1);
 
-  postMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
+  PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
   const apiType = await classifyApi(cmdKey);
   if (typeof apiType != 'object') {
     res.status(200).send(apiType);

@@ -1,4 +1,4 @@
-const postMessageToSlack = require('../common/postMessageToSlack');
+const PostMessageToSlack = require('../common/PostMessageToSlack');
 
 // TODO command 각각에 대한 파일을 나눠서 require 하는 방식으로 (api 폴더 나누기)
 const api42Commands = {

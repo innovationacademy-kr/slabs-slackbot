@@ -2,6 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
 const { AccessToken } = require('../models');
+const {createModel, updateModel} = require('../common/UseSequelize');
 
 const TOKEN_REQUEST_TIME_OUT = 2500;
 const END_POINT_42_API = "https://api.intra.42.fr";
@@ -33,26 +34,6 @@ const getClientCredentials = oauth.client(axios.create(), {
   scope: 'public'
 });
 
-const createModel = async function (model, token) {
-  try {
-    model.create(
-      { token: token }
-    )
-  } catch (err) {
-    console.log("초기 테이블 생성 오류");
-    console.log(err.message);
-  }
-};
-
-const updateModel = async function (model, token) {
-  try {
-    model.update( {token: token}, {where: { id: '1' }})
-  } catch (err) {
-    console.log("테이블 업데이트 오류");
-    console.log(err.message);
-  }
-};
-
 const api42 = {
   getUserData: async function (req, res, uriPart) {
     useUri = `${END_POINT_42_API}/v2/${uriPart}`;
@@ -65,8 +46,7 @@ const api42 = {
       req.session.token = await getToken();
       console.log("초기 DB 토큰: ", req.session.token);
       await createModel(AccessToken, req.session.token);
-      throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요🤗');
-      console.log("DEBUG=============================");
+      throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요😇🤗');
     }
 
     if (req.session.token === null) {
