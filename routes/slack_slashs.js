@@ -16,8 +16,9 @@ async function classifyApi(cmdKey) {
     return (useApi42);
   } else if (useApiNone.isApiCommand(cmdKey)) {
     return (useApiNone);
+  } else {
+    return '🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩';
   }
-  return ("🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩");
 }
 
 router.post('/', async (req, res, next) => {
@@ -27,8 +28,8 @@ router.post('/', async (req, res, next) => {
 
   PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
   const apiType = await classifyApi(cmdKey);
-  if (typeof apiType != 'object') {
-    res.status(200).send(apiType);
+  if (typeof apiType !== 'object') {
+    setTimeout(() => { res.status(200).send(apiType); }, 1000);
     return ;
   }
     
@@ -38,6 +39,7 @@ router.post('/', async (req, res, next) => {
     result = await slackCmd(apiData, channelId);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(200).send(error.message.substr(7));
   }
 });
