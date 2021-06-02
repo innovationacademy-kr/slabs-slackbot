@@ -33,11 +33,23 @@ const getClientCredentials = oauth.client(axios.create(), {
   scope: 'public'
 });
 
+const createModel = async function (model, token) {
+  try {
+    model.create(
+      { token: token }
+    )
+  } catch (err) {
+    console.log("초기 테이블 생성 오류");
+    console.log(err.message);
+  }
+};
+
 const updateModel = async function (model, token) {
   try {
     model.update( {token: token}, {where: { id: '1' }})
   } catch (err) {
-    console.log(err);
+    console.log("테이블 업데이트 오류");
+    console.log(err.message);
   }
 };
 
@@ -45,17 +57,19 @@ const api42 = {
   getUserData: async function (req, res, uriPart) {
     useUri = `${END_POINT_42_API}/v2/${uriPart}`;
 
-    // req.session.token = await getToken();
-    // await AccessToken.create(
-    //   { token: req.session.token }
-    // ).catch((err) => {
-    //   console.log(err);
-    // })
+    try {
+      const { token } = await AccessToken.findOne().then({where: {id: 1}});
+      req.session.token = token;
+      console.log("# token from database: ", token);
+    } catch (error) {
+      req.session.token = await getToken();
+      console.log("초기 DB 토큰: ", req.session.token);
+      await createModel(AccessToken, req.session.token);
+      throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요🤗');
+      console.log("DEBUG=============================");
+    }
 
-    const { token } = await AccessToken.findOne().then({where: {id: 1}});
-    req.session.token = token;
-    console.log("# token from database: ", token);
-    if (token === null) {
+    if (req.session.token === null) {
       const newToken = await getToken();
       console.log("# renew token", newToken);
       await updateModel(AccessToken, newToken);
@@ -74,10 +88,14 @@ const api42 = {
       // NOTE 42 API에서 찾지 못한 경우
       // 1. 없는 intra id인 경우
       // 2. token이 없는 경우
-      if (!req.session.token)
+      if (!req.session.token) {
+        console.log('서버 갱신');
         throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요🤗');
-      else
+      }
+      else {          
+        console.log('없는 아이디');
         throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ');
+      }
     }
   }
 };
