@@ -6,7 +6,7 @@ const commands = ['where', 'blackhole', 'salary'];
 
 const getUriPart = async (cmdKey, userName) => {
   const uriMap = {
-    'where': `/users/${userName}/locations`,
+    '도착': `/users/${userName}/locations`,
     'blackhole': `/users/${userName}`,
     'salary': `/users/${userName}/coalitions_users`
   }

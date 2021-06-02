@@ -10,7 +10,7 @@ const getEventCallBackResponse = async (event) => {
   if (event.type === 'message') {
     if(event.text === '안녕') {
       console.log(`인사 메시지 수신 channel:${event.channel}, user:${event.user}`);
-      await web.chat.postMessage({
+      await web.chat.PostMessage({
         channel: event.channel,
         text: `안녕하세요`
       }).then(result => {

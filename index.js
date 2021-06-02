@@ -16,7 +16,6 @@ const db = require('./models');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-
 global.token = '';
 
 const cookieParser = require('cookie-parser');

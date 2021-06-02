@@ -2,18 +2,10 @@ require('dotenv').config();
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
 const { AccessToken } = require('../models');
+const { findRecord, createRecord, updateRecord } = require('../common/UseSequelize');
 
 const TOKEN_REQUEST_TIME_OUT = 2500;
 const END_POINT_42_API = "https://api.intra.42.fr";
-
-const getToken = async function(){
-  const clientCredentials = await getClientCredentials();
-  const tmp = { ...clientCredentials };
-  const token = tmp.access_token;
-  //TODO 토큰 갱신주기 확인해보기
-  console.log("# token: ",token);
-  return token;
-};
 
 const axios42 = function (accessToken) {
   return (
@@ -33,55 +25,41 @@ const getClientCredentials = oauth.client(axios.create(), {
   scope: 'public'
 });
 
-const createModel = async function (model, token) {
-  try {
-    model.create(
-      { token: token }
-    )
-  } catch (err) {
-    console.log("초기 테이블 생성 오류");
-    console.log(err.message);
-  }
-};
-
-const updateModel = async function (model, token) {
-  try {
-    model.update( {token: token}, {where: { id: '1' }})
-  } catch (err) {
-    console.log("테이블 업데이트 오류");
-    console.log(err.message);
-  }
-};
+const getToken = (async function(){
+  const { access_token: accessToken } = await getClientCredentials();
+  console.log("# token: ", accessToken);
+  return accessToken;
+});
 
 const api42 = {
   getUserData: async function (req, res, uriPart) {
     useUri = `${END_POINT_42_API}/v2/${uriPart}`;
 
     try {
-      const { token } = await AccessToken.findOne().then({where: {id: 1}});
-      req.session.token = token;
-      console.log("# token from database: ", token);
+      //const { token: accessToken } = await AccessToken.findOne().then({where: {id: 1}});
+      const { token: accessToken } = await findRecord(AccessToken, {where: {id: 1}});
+      req.session.token = accessToken;
+      console.log("# token from database: ", req.session.token);
     } catch (error) {
       req.session.token = await getToken();
-      console.log("초기 DB 토큰: ", req.session.token);
-      await createModel(AccessToken, req.session.token);
-      throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요🤗');
-      console.log("DEBUG=============================");
+      console.log("초기 DB access token 토큰: ", req.session.token);
+      await createRecord(AccessToken, req.session.token);
+      throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요😊');
     }
 
     if (req.session.token === null) {
-      const newToken = await getToken();
-      console.log("# renew token", newToken);
-      await updateModel(AccessToken, newToken);
-      req.session.token = newToken;
+      const newAccessToken = await getToken();
+      console.log("# renew access token", newAccessToken);
+      await updateRecord(AccessToken, newAccessToken);
+      req.session.token = newAccessToken;
     }
 
     try {
-      const response = await axios.all([axios42(req.session.token).get(useUri)]);
-      ret = { ...response[0].data };
+      const api42Response = await axios.all([axios42(req.session.token).get(useUri)]);
+      ret = { ...api42Response[0].data };
       return ret;
     } catch (error) {
-      await updateModel(AccessToken, null);
+      await updateRecord(AccessToken, null);
       //console.log(error.response.data);
       console.log("# axios42 error status: ", error.response.status);
       // console.log(error.response.headers);
