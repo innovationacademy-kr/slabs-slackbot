@@ -33,7 +33,7 @@ const getToken = (async function(){
 
 const api42 = {
   getUserData: async function (req, res, uriPart) {
-    useUri = `${END_POINT_42_API}/v2/${uriPart}`;
+    const reqUri = `${END_POINT_42_API}/v2/${uriPart}`;
 
     try {
       //const { token: accessToken } = await AccessToken.findOne().then({where: {id: 1}});
@@ -55,7 +55,7 @@ const api42 = {
     }
 
     try {
-      const api42Response = await axios.all([axios42(req.session.token).get(useUri)]);
+      const api42Response = await axios.all([axios42(req.session.token).get(reqUri)]);
       ret = { ...api42Response[0].data };
       return ret;
     } catch (error) {

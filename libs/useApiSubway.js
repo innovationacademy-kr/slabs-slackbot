@@ -1,18 +1,17 @@
-const api42 = require('../services/api42');
-const api42Commands = require('./api42Commands');
+const apiSubway = require('../services/apiSubway');
+const apiSubwayCommands = require('./apiSubwayCommands');
 const PostMessageToSlack = require('../common/PostMessageToSlack');
 
-const commands = ['where', 'blackhole', 'salary'];
+const commands = ['subway'];
 
-const getUriPart = async (cmdKey, userName) => {
+const getUriPart = async (cmdKey, stationName) => {
   const uriMap = {
-    '도착': `/users/${userName}/locations`,
-    'blackhole': `/users/${userName}`,
-    'salary': `/users/${userName}/coalitions_users`
+    'subway': `json/realtimeStationArrival/0/5/${stationName}`,
   }
   return (uriMap[cmdKey] ? uriMap[cmdKey] : undefined);
 }
-const useApi42 = {
+
+const useApiSubway = {
   isApiCommand: function(cmdKey) {
     if (commands.includes(cmdKey) === false) {
       return false;
@@ -21,9 +20,7 @@ const useApi42 = {
   },
   getCommand: function(cmdKey) {
     const cmdMap = {
-      'where': api42Commands.where,
-      'blackhole': api42Commands.blackhole,
-      'salary': api42Commands.salary,
+      'subway': apiSubwayCommands.subway,
     }
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
   },
@@ -33,13 +30,12 @@ const useApi42 = {
 
     const uriPart = await getUriPart(cmdKey, userName);
     try {
-      const userData = await api42.getUserData(req, res, uriPart);
-      userData.login = userName;
-      return userData;
+      const subwayData = await apiSubway.getSubwayData(req, res, uriPart);
+      return subwayData;
     } catch (error) {
       throw new Error(error);
     }
   }
 }
 
-module.exports = useApi42;
+module.exports = useApiSubway;
