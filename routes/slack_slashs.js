@@ -8,17 +8,19 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 const useApi42 = require('../libs/useApi42');
+const useApiSubway = require('../libs/useApiSubway');
 const useApiNone = require('../libs/useApiNone');
 
 // NOTE 사용할 API 구분
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
     return (useApi42);
+  } else if (useApiSubway.isApiCommand){
+    return (useApiSubway);
   } else if (useApiNone.isApiCommand(cmdKey)) {
     return (useApiNone);
-  } else {
-    return '🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩';
   }
+  throw new Error('🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩');
 }
 
 router.post('/', async (req, res, next) => {
@@ -27,9 +29,12 @@ router.post('/', async (req, res, next) => {
   const [ cmdKey ] = body.text.split(' ', 1);
 
   PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
-  const apiType = await classifyApi(cmdKey);
-  if (typeof apiType !== 'object') {
-    setTimeout(() => { res.status(200).send(apiType); }, 1000);
+  let apiType;
+  try {
+    apiType = await classifyApi(cmdKey);
+  }
+  catch (error) {
+    setTimeout(() => { res.status(200).send(error.message); }, 1000);
     return ;
   }
     
@@ -39,7 +44,7 @@ router.post('/', async (req, res, next) => {
     result = await slackCmd(apiData, channelId);
     res.status(200).send(result);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(200).send(error.message.substr(7));
   }
 });
