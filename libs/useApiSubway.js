@@ -30,7 +30,9 @@ const useApiSubway = {
 
     const uriPart = await getUriPart(cmdKey, userName);
     try {
+      // FIXME: subwayData를 받아올 때, setTimeout을 사용해서 지연을 주기
       const subwayData = await apiSubway.getSubwayData(req, res, uriPart);
+
       return subwayData;
     } catch (error) {
       throw new Error(error);
