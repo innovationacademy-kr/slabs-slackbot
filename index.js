@@ -8,19 +8,23 @@ const helmet = require('helmet');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 const logger = require('morgan');
+
 // NOTE DB model setting
 const db = require('./models');
-const { Suggestion } = require('./models');
+
 // NOTE view engine setting
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 global.token = '';
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 app.use(session({
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
-  secret: process.env.SECRET
 }));
 app.use(helmet());
 app.use(logger('dev'));
@@ -28,7 +32,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 /*
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 */
 
 app.use('/', require('./routes'));

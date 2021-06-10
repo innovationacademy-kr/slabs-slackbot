@@ -1,5 +1,5 @@
 const api42 = require('../../services/api42');
-const postMessageToSlack = require('../../common/postMessageToSlack');
+const PostMessageToSlack = require('../../common/PostMessageToSlack');
 
 const getUserData = async (res, uriPart, channelId) => {
   let userData;
@@ -16,7 +16,7 @@ const getUserData = async (res, uriPart, channelId) => {
       message = '아이디를 바르게 입력 바랍니다..';
       //return;
     }
-    postMessageToSlack(message, channelId);
+    PostMessageToSlack(message, channelId);
     //return;
   }
   return userData;

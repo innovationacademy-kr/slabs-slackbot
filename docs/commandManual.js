@@ -3,8 +3,12 @@ const slackCmd = '/bot';
 module.exports = commandManual = {
    '카뎃의 위치를 조회합니다.'
    : `${slackCmd} where {intra_id}`,
+   '카뎃의 블랙홀 일수를 조회합니다.'
+   : `${slackCmd} blackhole {intra_id}`,
    '코알리숑 포인트를 조회합니다.(지원금 수급 여부)'
    : `${slackCmd} salary {intra_id}`,
+   '지하철역 도착정보를 조회합니다.'
+   : `${slackCmd} subway {지하철역명(ex. 개포동, 강남)}`,
    '문의메일 주소를 받습니다.'
    : `${slackCmd} mail`,
    '운영팀에게 기능 추가를 건의합니다.'

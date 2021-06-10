@@ -28,9 +28,7 @@ const apiNoneCommands = {
       Suggestion.create({
         content: `${apiData}`
       }).catch((err) => {
-        if (err) {
-          console.log(err);
-        }
+        console.log(err);
       })
       message = "📬 빠른 시일내에⏳ 구현하도록💻 노력해보겠습니다! 감사합니다🤓";
     }
