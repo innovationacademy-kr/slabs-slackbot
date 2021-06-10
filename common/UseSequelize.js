@@ -20,7 +20,7 @@ const createRecord = async function (model, token) {
   
 const updateRecord = async function (model, token) {
   try {
-    model.update( {token: token}, {where: { id: '1' }})
+    model.update( { token: token }, {where: { id: '1' }})
   } catch (err) {
       throw new Error("레코드 수정 오류");
   }

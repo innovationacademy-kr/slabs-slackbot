@@ -60,19 +60,16 @@ const api42 = {
       return ret;
     } catch (error) {
       await updateRecord(AccessToken, null);
-      //console.log(error.response.data);
       console.log("# axios42 error status: ", error.response.status);
-      // console.log(error.response.headers);
-      // NOTE 42 API에서 찾지 못한 경우
-      // 1. 없는 intra id인 경우
-      // 2. token이 없는 경우
-      if (!req.session.token) {
+      // NOTE 1. token이 잘못된 경우, 2. 없는 intra id인 경우
+      if (error.response.status === 401) {
         console.log('서버 갱신');
         throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요🤗');
-      }
-      else {          
+      } else if (error.response.status === 404) {          
         console.log('없는 아이디');
         throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ');
+      } else {
+        throw new Error('읭? 첨보는 에러에요ㅠㅠ');
       }
     }
   }
