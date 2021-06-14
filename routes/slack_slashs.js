@@ -15,7 +15,7 @@ const useApiNone = require('../libs/useApiNone');
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
     return (useApi42);
-  } else if (useApiSubway.isApiCommand){
+  } else if (useApiSubway.isApiCommand(cmdKey)){
     return (useApiSubway);
   } else if (useApiNone.isApiCommand(cmdKey)) {
     return (useApiNone);

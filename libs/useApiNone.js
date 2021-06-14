@@ -25,7 +25,6 @@ const useApiNone = {
     return (cmdMap[cmdKey]) ? cmdMap[cmdKey] : cmdKey;
   },
   getApiData: async function (req, res, body) {
-    //let apiNoneData = body.text.split(' ')[1];
     let apiNoneData = body.text;
     const tmpIdx = apiNoneData.indexOf(' ');
     if (tmpIdx < 0)
