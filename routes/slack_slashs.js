@@ -27,9 +27,9 @@ router.post('/', async (req, res, next) => {
   const { body } = req;
   const { channel_id: channelId } = body;
   const [ cmdKey ] = body.text.split(' ', 1);
-
   const messagePromise = PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
   let apiType;
+
   try {
     apiType = await classifyApi(cmdKey);
   } catch (error) {
@@ -40,6 +40,7 @@ router.post('/', async (req, res, next) => {
   try {
     const apiData = await apiType.getApiData(req, res, body);
     const slackCmd = await apiType.getCommand(cmdKey);
+
     result = await slackCmd(apiData, channelId);
     await messagePromise;
     res.status(200).send(result);

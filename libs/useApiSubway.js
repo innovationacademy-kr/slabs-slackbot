@@ -27,12 +27,10 @@ const useApiSubway = {
   getApiData: async function (req, res, body) {
     const {text: bodyText, channel_id: bodyChannelId} = body;
     const [cmdKey, userName] = bodyText.split(' ', 2);
-
     const uriPart = await getUriPart(cmdKey, userName);
-    try {
-      // FIXME: subwayData를 받아올 때, setTimeout을 사용해서 지연을 주기
-      const subwayData = await apiSubway.getSubwayData(req, res, uriPart);
 
+    try {
+      const subwayData = await apiSubway.getSubwayData(req, res, uriPart);
       return subwayData;
     } catch (error) {
       throw new Error(error);

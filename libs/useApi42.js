@@ -12,6 +12,7 @@ const getUriPart = async (cmdKey, userName) => {
   }
   return (uriMap[cmdKey] ? uriMap[cmdKey] : undefined);
 }
+
 const useApi42 = {
   isApiCommand: function(cmdKey) {
     if (commands.includes(cmdKey) === false) {
@@ -30,8 +31,8 @@ const useApi42 = {
   getApiData: async function (req, res, body) {
     const {text: bodyText, channel_id: bodyChannelId} = body;
     const [cmdKey, userName] = bodyText.split(' ', 2);
-
     const uriPart = await getUriPart(cmdKey, userName);
+
     try {
       const userData = await api42.getUserData(req, res, uriPart);
       userData.login = userName;

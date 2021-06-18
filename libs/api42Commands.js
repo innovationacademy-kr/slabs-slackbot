@@ -13,11 +13,10 @@ const api42Commands = {
   blackhole: async function(userData, channelId) {
     const { login: userLogin } = userData;
     const { blackholed_at } = userData.cursus_users[1];
-
     const absorptionDate = new Date(blackholed_at);
     const todayDate = new Date();
-    restOfDay = Math.floor((absorptionDate - todayDate) / 1000 / 60 / 60 / 24);
 
+    restOfDay = Math.floor((absorptionDate - todayDate) / 1000 / 60 / 60 / 24);
     if (restOfDay > 100) {
       return (`✨ ${userLogin}님은 블랙홀이 ${restOfDay}일 남았어요☀ ️`);
     } else if (restOfDay > 50) {

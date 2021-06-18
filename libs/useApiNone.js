@@ -27,6 +27,7 @@ const useApiNone = {
   getApiData: async function (req, res, body) {
     let apiNoneData = body.text;
     const tmpIdx = apiNoneData.indexOf(' ');
+
     if (tmpIdx < 0)
       return "empty string";
     apiNoneData = apiNoneData.substr(tmpIdx);
