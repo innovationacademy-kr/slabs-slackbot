@@ -10,6 +10,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 const useApi42 = require('../libs/useApi42');
 const useApiSubway = require('../libs/useApiSubway');
 const useApiNone = require('../libs/useApiNone');
+const api42 = require('../services/api42');
 
 // NOTE 사용할 API 구분
 async function classifyApi(cmdKey) {
@@ -30,13 +31,14 @@ router.post('/', async (req, res, next) => {
   const messagePromise = PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
   let apiType;
 
+  //renewApiToken(req);
   try {
     apiType = await classifyApi(cmdKey);
   } catch (error) {
     setTimeout(() => { res.status(200).send(error.message); }, 1000);
     return ;
   }
-    
+
   try {
     const apiData = await apiType.getApiData(req, res, body);
     const slackCmd = await apiType.getCommand(cmdKey);
