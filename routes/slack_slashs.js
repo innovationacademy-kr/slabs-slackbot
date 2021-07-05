@@ -24,6 +24,15 @@ async function classifyApi(cmdKey) {
   throw new Error('🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩');
 }
 
+// NOTE: 전반적인 동작 과정에 대한 GUIDE LINE
+// 1. slack 채팅창으로부터 정보를 받습니다.
+// 2. 입력된 메세지를 그대로 유저에게 보여줍니다. (PostMessageToSlack)
+// 3. command key에 따라서 유저가 사용할 api를 구분합니다. (classifyApi)
+//    -- 등록되지 않은 command key인 경우: 일정시간 뒤에 error를 출력합니다.
+// 4. 유저가 원하는 명령어를 사용하기 위한 api의 데이터를 가지고 옵니다. (getApiData)
+// 5. 유저가 원하는 command key에 대한 함수를 가지고 옵니다. (getCommand)
+// 6. 함수에 대한 결과를 가지고 옵니다. (slackCmd)
+//    -- 에러가 발생한 경우: getApiData, getCommand, slackCmd 내부에서 발생하는 에러에 대해 출력합니다.
 router.post('/', async (req, res, next) => {
   const { body } = req;
   const { channel_id: channelId } = body;
@@ -31,7 +40,6 @@ router.post('/', async (req, res, next) => {
   const messagePromise = PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
   let apiType;
 
-  //renewApiToken(req);
   try {
     apiType = await classifyApi(cmdKey);
   } catch (error) {
