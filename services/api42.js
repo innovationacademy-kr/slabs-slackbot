@@ -46,6 +46,12 @@ async function getTokenFromDB(req) {
   }
 }
 
+async function setTokenToDB(req, sequelizeRecordAction) {
+  [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
+  await sequelizeRecordAction(AccessToken, req.session); // 비동기적으로 DB 갱신
+  req.session.timeAfterUpdatingToken = Date.now();
+}
+
 // NOTE: Access Token 및 api 정보를 가지고오는 과정에 대한 GUIDLINE 
 // 1. Access token과 만료 시간을 DB로부터 받아옵니다.(getTokenFromDB)
 //    -- accessToken이 없는 경우: 42 api로부터 토큰과 만료시간을 받아온(getTokenFrom42Api) 후, DB에 저장합니다.
@@ -64,9 +70,8 @@ const api42 = {
     try {
       await getTokenFromDB(req);
     } catch (error) {
-      [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
-      console.log("초기 DB access token 토큰: ", req.session.accessToken);
-      await createRecord(AccessToken, req.session);
+      setTokenToDB(req, createRecord);
+      console.log("# Initialized access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
       throw new Error('🖥 서버가 토큰을 처음 받습니다! 명령어를 한번 더 입력해주세요😊');
     }
 
@@ -78,14 +83,11 @@ const api42 = {
       console.log("# axios42 error status: ", error.response.status);
       // NOTE 1. token이 만료된 경우, 2. 없는 intra id인 경우
       if (error.response.status === 401) {
-        [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
-        console.log("req.session.accessToken: ", req.session.accessToken, "req.session.expireTime: ", req.session.expireTime);
-        console.log("req.session: ", req.session);
-        updateRecord(AccessToken, req.session); // 비동기적으로 DB 갱신
-        console.log('서버 갱신'); 
+        setTokenToDB(req, updateRecord);
+        console.log("# Updated access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
         throw new Error('🖥 서버가 정보를 갱신했습니다! 명령어를 한번 더 입력해주세요🤗');
       } else if (error.response.status === 404) {          
-        console.log('없는 아이디');
+        console.log('# invalid intra_id 입력');
         throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ');
       } else {
         throw new Error('읭? 첨보는 에러에요ㅠㅠ');
