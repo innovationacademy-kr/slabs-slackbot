@@ -26,22 +26,23 @@ const getClientCredentials = oauth.client(axios.create(), {
 });
 
 async function getTokenFrom42Api() {
-  const { access_token: accessToken, expires_in: expireTime } = await getClientCredentials();
-  const tokenTotalInfo = await getClientCredentials();
-  return [ accessToken, expireTime ];
+  console.log("# 42API에서 받아오기")
+  const { access_token, expires_in } = await getClientCredentials();
+  console.log("# renew access token", access_token);
+  console.log("# renew limit time", expires_in);
+  return [ access_token, expires_in ];
 }
 
 async function getTokenFromDB(req) {
   const { access_token: accessToken, expires_in: expireTime } = await findRecord(AccessToken, {where: {id: 1}});
   [ req.session.accessToken, req.session.expireTime ] = [ accessToken, expireTime ];
-  console.log("# accessToken from database: ", req.session.accessToken);
-  console.log("# expireTime from database: ", req.session.expireTime);
+  console.log("# Updated access token from DB", req.session.accessToken);
+  console.log("# Updated expired time from DB", req.session.expireTime)
 
   if (req.session.accessToken === null) {
-    const [newAccessToken, newExpireTime] = await getTokenFrom42Api();
-    [ req.session.accessToken, req.session.expireTime ] = [ newAccessToken, newExpireTime ];
-    console.log("# renew access token", newAccessToken);
-    console.log("# renew limit time", newExpireTime);
+    [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
+    console.log("# Updated access token from 42Api", req.session.accessToken);
+    console.log("# Updated expired time from 42Api", req.session.expireTime)
     await updateRecord(AccessToken, req.session);
   }
 }
@@ -57,14 +58,29 @@ async function getTokenFromDB(req) {
 //    -- 에러가 있는 경우: 에러 코드를 확인합니다.
 //                     -- 401인 경우: 토큰이 만료된 경우로, access token을 갱신합니다.
 //                     -- 404인 경우: 사용자가 없는 아이디를 입력하여 발생하는 에러임을 나타냅니다.
-const INTERVAL_TIME = 5000;
 const MSEC2SEC = 0.001;
+const SEC2MSEC = 1000;
+const THRESHOLD = 1.05;
+const INTERVAL_TIME = 60 * 5 * SEC2MSEC;
 
 const api42 = {
+  periodicFetchToken: async function (req) {
+    global.timeAfterUpdatingToken = global.timeAfterUpdatingToken == undefined ? Date.now() : global.timeAfterUpdatingToken;
+    global.setInterval(() => {
+      const timeGap = (Date.now() - global.timeAfterUpdatingToken) * MSEC2SEC;
+      if (timeGap > req.session.expireTime * THRESHOLD) {
+        console.log("# AccessToken time out! => Called periodicFetchToken!");
+        this.setTokenToDB(req, updateRecord);
+      } else {
+        console.log("# [DEBUG] time gap: ", timeGap);
+      }
+    }, INTERVAL_TIME);
+  },
   setTokenToDB: async function (req, sequelizeRecordAction) {
     [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
     await sequelizeRecordAction(AccessToken, req.session); // 비동기적으로 DB 갱신
-    console.log("# Updated access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
+    console.log("# Updated access token from 42Api", req.session.accessToken);
+    console.log("# Updated expired time from 42Api", req.session.expireTime)
     global.timeAfterUpdatingToken = Date.now();
   }, 
   getUserData: async function (req, res, uriPart) {
@@ -74,7 +90,8 @@ const api42 = {
       await getTokenFromDB(req);
     } catch (error) {
       this.setTokenToDB(req, createRecord);
-      console.log("# Initialized access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
+      console.log("# Initialized access token from DB: ", req.session.accessToken)
+      console.log("# Initilaized expired time from DB: ", req.session.expireTime);
       throw new Error('🖥 서버가 토큰을 처음 받습니다! 명령어를 한번 더 입력해주세요😊');
     }
 
@@ -90,7 +107,8 @@ const api42 = {
       }
       if (error.response.status === 401) {
         this.setTokenToDB(req, updateRecord);
-        console.log("# Updated access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
+        console.log("# Updated access token from 42Api", req.session.accessToken);
+        console.log("# Updated expired time from 42Api", req.session.expireTime)
         throw new Error('🖥 서버가 정보를 갱신했습니다! 명령어를 한번 더 입력해주세요🤗');
       } else if (error.response.status === 404) {          
         console.log('# invalid intra_id 입력');
