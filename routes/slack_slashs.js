@@ -11,8 +11,12 @@ const useApi42 = require('../libs/useApi42');
 const useApiSubway = require('../libs/useApiSubway');
 const useApiNone = require('../libs/useApiNone');
 const api42 = require('../services/api42');
+const { updateRecord } = require('../common/UseSequelize');
 
-// NOTE 사용할 API 구분
+const INTERVAL_TIME = 5000;
+const MSEC2SEC = 0.001;
+const THRESHOLD = 0.85;
+
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
     return (useApi42);
@@ -39,6 +43,27 @@ router.post('/', async (req, res, next) => {
   const [ cmdKey ] = body.text.split(' ', 1);
   const messagePromise = PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
   let apiType;
+
+  // FIXME: access token 갱신============================================
+  // 시작할 때 한번만 수행해야됨
+  // 이벤트가 누적되면 안됨
+  if (!global.flag) {
+    //getTokenFromDB를 일단 해와야할듯
+    global.setInterval(periodicFetchToken, INTERVAL_TIME);
+    global.flag = true;
+  }
+
+  async function periodicFetchToken() {
+    const timeGap = (Date.now() - global.timeAfterUpdatingToken) * MSEC2SEC;
+    if (timeGap > req.session.expireTime * THRESHOLD) {
+      console.log("# AccessToken time out! => Called periodicFetchToken!");
+      api42.setTokenToDB(req, updateRecord);
+    } else {
+      console.log("# [DEBUG] time gap: ", timeGap);
+    }
+  }
+
+  global.timeAfterUpdatingToken = global.timeAfterUpdatingToken == undefined ? Date.now() : global.timeAfterUpdatingToken;
 
   try {
     apiType = await classifyApi(cmdKey);

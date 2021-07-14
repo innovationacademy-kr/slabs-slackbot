@@ -46,12 +46,6 @@ async function getTokenFromDB(req) {
   }
 }
 
-async function setTokenToDB(req, sequelizeRecordAction) {
-  [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
-  await sequelizeRecordAction(AccessToken, req.session); // 비동기적으로 DB 갱신
-  req.session.timeAfterUpdatingToken = Date.now();
-}
-
 // NOTE: Access Token 및 api 정보를 가지고오는 과정에 대한 GUIDLINE 
 // 1. Access token과 만료 시간을 DB로부터 받아옵니다.(getTokenFromDB)
 //    -- accessToken이 없는 경우: 42 api로부터 토큰과 만료시간을 받아온(getTokenFrom42Api) 후, DB에 저장합니다.
@@ -63,14 +57,23 @@ async function setTokenToDB(req, sequelizeRecordAction) {
 //    -- 에러가 있는 경우: 에러 코드를 확인합니다.
 //                     -- 401인 경우: 토큰이 만료된 경우로, access token을 갱신합니다.
 //                     -- 404인 경우: 사용자가 없는 아이디를 입력하여 발생하는 에러임을 나타냅니다.
+const INTERVAL_TIME = 5000;
+const MSEC2SEC = 0.001;
+
 const api42 = {
+  setTokenToDB: async function (req, sequelizeRecordAction) {
+    [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
+    await sequelizeRecordAction(AccessToken, req.session); // 비동기적으로 DB 갱신
+    console.log("# Updated access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
+    global.timeAfterUpdatingToken = Date.now();
+  }, 
   getUserData: async function (req, res, uriPart) {
     const reqUri = `${END_POINT_42_API}/v2/${uriPart}`;
 
     try {
       await getTokenFromDB(req);
     } catch (error) {
-      setTokenToDB(req, createRecord);
+      this.setTokenToDB(req, createRecord);
       console.log("# Initialized access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
       throw new Error('🖥 서버가 토큰을 처음 받습니다! 명령어를 한번 더 입력해주세요😊');
     }
@@ -80,10 +83,13 @@ const api42 = {
       ret = { ...api42Response[0].data };
       return ret;
     } catch (error) {
-      console.log("# axios42 error status: ", error.response.status);
+      // console.log("# axios42 error status: ", error.response.status);
       // NOTE 1. token이 만료된 경우, 2. 없는 intra id인 경우
+      if (error.response.status === undefined) {
+        throw new Error('읭? 첨보는 에러에요ㅠㅠ');
+      }
       if (error.response.status === 401) {
-        setTokenToDB(req, updateRecord);
+        this.setTokenToDB(req, updateRecord);
         console.log("# Updated access token: ", req.session.accessToken, ", expired time: ", req.session.expireTime);
         throw new Error('🖥 서버가 정보를 갱신했습니다! 명령어를 한번 더 입력해주세요🤗');
       } else if (error.response.status === 404) {          

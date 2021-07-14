@@ -2,9 +2,11 @@ const api42 = require('../services/api42');
 const api42Commands = require('./api42Commands');
 const PostMessageToSlack = require('../common/PostMessageToSlack');
 
+// 기능 추가: 추가하고 싶은 42api 관련 명령어를 작성해주세요
 const commands = ['where', 'blackhole', 'salary'];
 
 const getUriPart = async (cmdKey, userName) => {
+  // 기능 추가: 추가하고 싶은 42api를 위해 사용하는 uri를 매치 시켜주세요
   const uriMap = {
     'where': `/users/${userName}/locations`,
     'blackhole': `/users/${userName}`,
@@ -21,6 +23,7 @@ const useApi42 = {
     return true;
   },
   getCommand: function(cmdKey) {
+    // 추가: api42Commands에 원하는 함수를 추가하고 이를 명령어와 매치 시켜주세요
     const cmdMap = {
       'where': api42Commands.where,
       'blackhole': api42Commands.blackhole,

@@ -17,6 +17,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 global.token = '';
+global.flag = false;
 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
