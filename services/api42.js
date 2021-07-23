@@ -72,7 +72,7 @@ const api42 = {
         console.log("# AccessToken time out! => Called periodicFetchToken!");
         this.setTokenToDB(req, updateRecord);
       } else {
-        console.log("# [DEBUG] time gap: ", timeGap);
+        console.log("# [DEBUG] [", Date(), "] time gap: ", timeGap);
       }
     }, INTERVAL_TIME);
   },
