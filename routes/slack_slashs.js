@@ -1,4 +1,4 @@
-require('dotenv').config();
+const schedule = require('node-schedule');
 const express = require('express');
 const router = express.Router();
 const PostMessageToSlack = require('../common/PostMessageToSlack');
@@ -7,6 +7,7 @@ const useApi42 = require('../libs/useApi42');
 const useApiSubway = require('../libs/useApiSubway');
 const useApiNone = require('../libs/useApiNone');
 const api42 = require('../services/api42');
+const recordLog = require('../libs/recordLog');
 
 async function classifyApi(cmdKey) {
   if (useApi42.isApiCommand(cmdKey)) {
@@ -19,8 +20,6 @@ async function classifyApi(cmdKey) {
   throw new Error('🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩');
 }
 
-const schedule = require('node-schedule');
-
 // NOTE: 전반적인 동작 과정에 대한 GUIDE LINE
 // 1. slack 채팅창으로부터 정보를 받습니다.
 // 2. 입력된 메세지를 그대로 유저에게 보여줍니다. (PostMessageToSlack)
@@ -32,6 +31,7 @@ const schedule = require('node-schedule');
 //    -- 에러가 발생한 경우: getApiData, getCommand, slackCmd 내부에서 발생하는 에러에 대해 출력합니다.
 router.post('/', async (req, res, next) => {
   const { body } = req;
+  recordLog(body);
   const { channel_id: channelId } = body;
   const [ cmdKey ] = body.text.split(' ', 1);
   const messagePromise = PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
