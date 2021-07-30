@@ -1,4 +1,3 @@
-require('dotenv').config();
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
 const { AccessToken } = require('../models');
@@ -64,17 +63,16 @@ const THRESHOLD = 1.05;
 const INTERVAL_TIME = 60 * 5 * SEC2MSEC;
 
 const api42 = {
-  periodicFetchToken: async function (req) {
+  fetchToken: async function (req) {
     global.timeAfterUpdatingToken = global.timeAfterUpdatingToken == undefined ? Date.now() : global.timeAfterUpdatingToken;
-    global.setInterval(() => {
-      const timeGap = (Date.now() - global.timeAfterUpdatingToken) * MSEC2SEC;
-      if (timeGap > req.session.expireTime * THRESHOLD) {
-        console.log("# AccessToken time out! => Called periodicFetchToken!");
-        this.setTokenToDB(req, updateRecord);
-      } else {
-        console.log("# [DEBUG] [", Date(), "] time gap: ", timeGap);
-      }
-    }, INTERVAL_TIME);
+    const timeGap = (Date.now() - global.timeAfterUpdatingToken) * MSEC2SEC;
+    console.log("expire time: ", req.session.expireTime);
+    if (timeGap > req.session.expireTime * THRESHOLD) {
+      console.log("# AccessToken time out! => Called periodicFetchToken!");
+      this.setTokenToDB(req, updateRecord);
+    } else {
+      console.log("# [DEBUG] [", Date(), "] time gap: ", timeGap);
+    }
   },
   setTokenToDB: async function (req, sequelizeRecordAction) {
     [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
@@ -102,7 +100,7 @@ const api42 = {
     } catch (error) {
       // console.log("# axios42 error status: ", error.response.status);
       // NOTE 1. token이 만료된 경우, 2. 없는 intra id인 경우
-      if (error.response.status === undefined) {
+      if (isNaN(error.response.status)) {
         throw new Error('읭? 첨보는 에러에요ㅠㅠ');
       }
       if (error.response.status === 401) {
@@ -112,7 +110,7 @@ const api42 = {
         throw new Error('🖥 서버가 정보를 갱신했습니다! 명령어를 한번 더 입력해주세요🤗');
       } else if (error.response.status === 404) {          
         console.log('# invalid intra_id 입력');
-        throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ');
+        throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다😭');
       } else {
         throw new Error('읭? 첨보는 에러에요ㅠㅠ');
       }

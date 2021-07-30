@@ -36,13 +36,9 @@ const useApi42 = {
     const [cmdKey, userName] = bodyText.split(' ', 2);
     const uriPart = await getUriPart(cmdKey, userName);
 
-    try {
-      const userData = await api42.getUserData(req, res, uriPart);
-      userData.login = userName;
-      return userData;
-    } catch (error) {
-      throw new Error(error);
-    }
+    const userData = await api42.getUserData(req, res, uriPart);
+    userData.login = userName;
+    return userData;
   }
 }
 

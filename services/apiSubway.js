@@ -1,8 +1,5 @@
-require('dotenv').config();
 const axios = require('axios');
-const oauth = require('axios-oauth-client');
 
-const TOKEN_REQUEST_TIME_OUT = 2500;
 const END_POINT_42_API = "http://swopenAPI.seoul.go.kr/api/subway";
 
 const apiSubway = {

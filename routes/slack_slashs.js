@@ -3,10 +3,6 @@ const express = require('express');
 const router = express.Router();
 const PostMessageToSlack = require('../common/PostMessageToSlack');
 
-const bodyParser = require('body-parser');
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }));
-
 const useApi42 = require('../libs/useApi42');
 const useApiSubway = require('../libs/useApiSubway');
 const useApiNone = require('../libs/useApiNone');
@@ -23,6 +19,8 @@ async function classifyApi(cmdKey) {
   throw new Error('🤖 없는 명령어를 입력하셨어요.😭\n함께 많은 기능을 만들어보아요🤩');
 }
 
+const schedule = require('node-schedule');
+
 // NOTE: 전반적인 동작 과정에 대한 GUIDE LINE
 // 1. slack 채팅창으로부터 정보를 받습니다.
 // 2. 입력된 메세지를 그대로 유저에게 보여줍니다. (PostMessageToSlack)
@@ -37,17 +35,20 @@ router.post('/', async (req, res, next) => {
   const { channel_id: channelId } = body;
   const [ cmdKey ] = body.text.split(' ', 1);
   const messagePromise = PostMessageToSlack(`👌 ❰${body.text}❱ 명령을 입력하셨어요🤩`, channelId);
-  let apiType;
 
   // NOTE: 시작할 때 한번만 수행해야되므로(이벤트 누적을 막기 위해) flag 사용.
   if (!global.flag) {
-    api42.periodicFetchToken(req)
+    const scheduler = schedule.scheduleJob('*/30 * * * * *', function() {
+      api42.fetchToken(req);
+    });
     global.flag = true;
   }
 
+  let apiType;
   try {
     apiType = await classifyApi(cmdKey);
   } catch (error) {
+    await messagePromise;
     setTimeout(() => { res.status(200).send(error.message); }, 1000);
     return ;
   }
@@ -55,13 +56,13 @@ router.post('/', async (req, res, next) => {
   try {
     const apiData = await apiType.getApiData(req, res, body);
     const slackCmd = await apiType.getCommand(cmdKey);
+    const result = await slackCmd(apiData, channelId);
 
-    result = await slackCmd(apiData, channelId);
     await messagePromise;
     res.status(200).send(result);
   } catch (error) {
-    console.error(error);
-    res.status(200).send(error.message.substr(7));
+    console.error(error.message);
+    res.status(200).send(error.message);
   }
 });
 
