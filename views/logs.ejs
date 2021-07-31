@@ -17,7 +17,11 @@
   <ul>
       <% for (let i = 0; data[i]; ++i) { %>
         <li>
-            <%= i + 1 %>. <%= data[i] %>
+          🤖[<%= data[i].createdAt %>]
+          🏢[<%= data[i].channel_name %>]
+          🖥[<%= data[i].user_name %>]
+          💬[<%= data[i].command %>]
+          💭[<%= data[i].arguments %>]
         </li>
       <% } %>
   </ul>
