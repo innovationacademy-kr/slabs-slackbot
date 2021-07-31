@@ -25,10 +25,7 @@ const getClientCredentials = oauth.client(axios.create(), {
 });
 
 async function getTokenFrom42Api() {
-  console.log("# 42API에서 받아오기")
   const { access_token, expires_in } = await getClientCredentials();
-  console.log("# renew access token", access_token);
-  console.log("# renew limit time", expires_in);
   return [ access_token, expires_in ];
 }
 
@@ -58,16 +55,16 @@ async function getTokenFromDB(req) {
 //                     -- 401인 경우: 토큰이 만료된 경우로, access token을 갱신합니다.
 //                     -- 404인 경우: 사용자가 없는 아이디를 입력하여 발생하는 에러임을 나타냅니다.
 const MSEC2SEC = 0.001;
-const SEC2MSEC = 1000;
-const THRESHOLD = 1.05;
-const INTERVAL_TIME = 60 * 5 * SEC2MSEC;
 
 const api42 = {
   fetchToken: async function (req) {
-    global.timeAfterUpdatingToken = global.timeAfterUpdatingToken == undefined ? Date.now() : global.timeAfterUpdatingToken;
-    const timeGap = (Date.now() - global.timeAfterUpdatingToken) * MSEC2SEC;
-    console.log("expire time: ", req.session.expireTime);
-    if (timeGap > req.session.expireTime * THRESHOLD) {
+    let timeGap;
+    if (global.timeAfterUpdatingToken === undefined) {
+      this.setTokenToDB(req, updateRecord);
+    } else {
+      timeGap = (Date.now() - global.timeAfterUpdatingToken) * MSEC2SEC;
+    }
+    if (timeGap > req.session.expireTime) {
       console.log("# AccessToken time out! => Called periodicFetchToken!");
       this.setTokenToDB(req, updateRecord);
     } else {
@@ -98,21 +95,21 @@ const api42 = {
       ret = { ...api42Response[0].data };
       return ret;
     } catch (error) {
-      // console.log("# axios42 error status: ", error.response.status);
       // NOTE 1. token이 만료된 경우, 2. 없는 intra id인 경우
-      if (isNaN(error.response.status)) {
-        throw new Error('읭? 첨보는 에러에요ㅠㅠ');
-      }
-      if (error.response.status === 401) {
-        this.setTokenToDB(req, updateRecord);
-        console.log("# Updated access token from 42Api", req.session.accessToken);
-        console.log("# Updated expired time from 42Api", req.session.expireTime)
-        throw new Error('🖥 서버가 정보를 갱신했습니다! 명령어를 한번 더 입력해주세요🤗');
-      } else if (error.response.status === 404) {          
-        console.log('# invalid intra_id 입력');
-        throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다😭');
-      } else {
-        throw new Error('읭? 첨보는 에러에요ㅠㅠ');
+      switch (error.response.status) {
+        case 401:
+          this.setTokenToDB(req, updateRecord);
+          console.log("# Updated access token from 42Api", req.session.accessToken);
+          console.log("# Updated expired time from 42Api", req.session.expireTime)
+          throw new Error('🖥 서버가 정보를 갱신했습니다! 명령어를 한번 더 입력해주세요🤗');
+          break;
+        case 404:
+          console.log('# invalid intra_id 입력');
+          throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다😭');
+          break;
+        default:
+          throw new Error('읭? 첨보는 에러에요ㅠㅠ');
+          break;
       }
     }
   }
