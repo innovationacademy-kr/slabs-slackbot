@@ -1,6 +1,6 @@
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
-const { AccessToken } = require('../models');
+const { NewAccessToken } = require('../models');
 const { findRecord, createRecord, updateRecord } = require('../common/UseSequelize');
 
 const TOKEN_REQUEST_TIME_OUT = 2500;
@@ -30,7 +30,7 @@ async function getTokenFrom42Api() {
 }
 
 async function getTokenFromDB(req) {
-  const { access_token: accessToken, expires_in: expireTime } = await findRecord(AccessToken, {where: {id: 1}});
+  const { access_token: accessToken, expires_in: expireTime } = await findRecord(NewAccessToken, {where: {id: 1}});
   [ req.session.accessToken, req.session.expireTime ] = [ accessToken, expireTime ];
   console.log("# Updated access token from DB", req.session.accessToken);
   console.log("# Updated expired time from DB", req.session.expireTime)
@@ -73,7 +73,7 @@ const api42 = {
   },
   setTokenToDB: async function (req, sequelizeRecordAction) {
     [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
-    await sequelizeRecordAction(AccessToken, req.session); // 비동기적으로 DB 갱신
+    await sequelizeRecordAction(NewAccessToken, req.session); // 비동기적으로 DB 갱신
     console.log("# Updated access token from 42Api", req.session.accessToken);
     console.log("# Updated expired time from 42Api", req.session.expireTime)
     global.timeAfterUpdatingToken = Date.now();
