@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const PostMessageToSlack = require('../common/PostMessageToSlack');
+const PostMessageToSlack = require('../../common/PostMessageToSlack');
 
 const token = process.env.SLACK_TOKEN;
 
@@ -14,7 +14,7 @@ const getEventCallBackResponse = (event) => {
       return (undefined);
     }
   }
-} 
+}
 
 router.post('/', async (req, res, next) => {
   const { body } = req;

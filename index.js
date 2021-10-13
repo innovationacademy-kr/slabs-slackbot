@@ -33,9 +33,16 @@ app.use(helmet());
 app.use(logger('dev'));
 
 app.use('/', require('./routes'));
-app.use('/slack/events', require('./routes/slack_events'));
+
+// NOTE: event subscriptions를 사용하는 부분입니다. 현재 사용하고 있지 않습니다.
+// 기능 추가를 위해 scope 수정 및 추가할 기능에 대해 논의가 필요합니다.
+// const slackEventsRoute = require('./routes/slack/events');
+// app.use('/slack/events', slackEventsRoute);
+
+// NOTE: slash command를 사용하는 부분입니다.
 global.flag = false;
-app.use('/slack/slashs', require('./routes/slack_slashs'));
+const slackSlashsRoute = require('./routes/slack/slashs');
+app.use('/slack/slashs', slackSlashsRoute);
 
 app.use((err, req, res, next) => {
   console.error(err);
