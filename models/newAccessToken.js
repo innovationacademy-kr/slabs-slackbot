@@ -4,7 +4,7 @@
 */ 
 
 module.exports = (sequelize, DataTypes) => {
-    const AccessToken = sequelize.define('AccessToken', {
+    const NewAccessToken = sequelize.define('NewAccessToken', {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: false,
@@ -25,5 +25,5 @@ module.exports = (sequelize, DataTypes) => {
         },
       }
     });
-    return AccessToken;
+    return NewAccessToken;
   }
