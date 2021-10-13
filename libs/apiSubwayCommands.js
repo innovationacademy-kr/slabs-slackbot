@@ -1,7 +1,6 @@
 const PostMessageToSlack = require('../common/PostMessageToSlack');
 
 const apiSubwayCommand = {
-
   subway: async function(subwayData, channelId) {
     let message = '';
     const { data: { realtimeArrivalList: arrivalList } } = subwayData;

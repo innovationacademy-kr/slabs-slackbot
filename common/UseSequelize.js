@@ -8,19 +8,31 @@ const findRecord = async function (model, searchCondition) {
   }
 };
 
-const createRecord = async function (model, token) {
+const createRecord = async function (model, data) {
   try {
     model.create(
-      { token: token }
+      { 
+        id: 1,
+        access_token: data.accessToken,
+        expires_in: data.expireTime
+      }
     )
   } catch (err) {
     throw new Error("(초기) 레코드 생성 오류");
   }
 };
   
-const updateRecord = async function (model, token) {
+const updateRecord = async function (model, data) {
   try {
-    model.update( { token: token }, {where: { id: '1' }})
+    model.update(
+      {
+        access_token: data.accessToken,
+        expires_in: data.expireTime
+      }, 
+      {
+        where: { id: '1' }
+      })
+    console.log("레코드 수정 완료");
   } catch (err) {
       throw new Error("레코드 수정 오류");
   }

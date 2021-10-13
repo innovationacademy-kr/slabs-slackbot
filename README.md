@@ -18,7 +18,7 @@
   `/bot secret`
 - 로또 번호를 무작위 추첨해 줍니다.  
   `/bot lotto`  
-- 블랙홀까지 남은 기간을 가르쳐줍니다.
+- 블랙홀까지 남은 기간을 가르쳐줍니다.  
   `/bot blackhole {intra_id}`  
 
 ## 42 API app 및 Slack API 봇 생성하기

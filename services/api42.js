@@ -1,4 +1,3 @@
-require('dotenv').config();
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
 const { AccessToken } = require('../models');
@@ -25,51 +24,92 @@ const getClientCredentials = oauth.client(axios.create(), {
   scope: 'public'
 });
 
-const getToken = (async function(){
-  const { access_token: accessToken } = await getClientCredentials();
-  console.log("# token: ", accessToken);
-  return accessToken;
-});
+async function getTokenFrom42Api() {
+  const { access_token, expires_in } = await getClientCredentials();
+  return [ access_token, expires_in ];
+}
+
+async function getTokenFromDB(req) {
+  const { access_token: accessToken, expires_in: expireTime } = await findRecord(AccessToken, {where: {id: 1}});
+  [ req.session.accessToken, req.session.expireTime ] = [ accessToken, expireTime ];
+  console.log("# Updated access token from DB", req.session.accessToken);
+  console.log("# Updated expired time from DB", req.session.expireTime)
+
+  if (req.session.accessToken === null) {
+    [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
+    console.log("# Updated access token from 42Api", req.session.accessToken);
+    console.log("# Updated expired time from 42Api", req.session.expireTime)
+    await updateRecord(AccessToken, req.session);
+  }
+}
+
+// NOTE: Access Token 및 api 정보를 가지고오는 과정에 대한 GUIDLINE 
+// 1. Access token과 만료 시간을 DB로부터 받아옵니다.(getTokenFromDB)
+//    -- accessToken이 없는 경우: 42 api로부터 토큰과 만료시간을 받아온(getTokenFrom42Api) 후, DB에 저장합니다.
+//       (DB가 처음 생긴 경우 및 token이 만료된 경우로 간주합니다.)
+//    -- accessToken이 있는 경우: 2. 42 api로부터 정보를 받아옵니다.
+//
+// 2. 42 api로부터 정보를 받아옵니다.
+//    -- 에러가 없는 경우: 3. uri에 대한 정보를 반환합니다.
+//    -- 에러가 있는 경우: 에러 코드를 확인합니다.
+//                     -- 401인 경우: 토큰이 만료된 경우로, access token을 갱신합니다.
+//                     -- 404인 경우: 사용자가 없는 아이디를 입력하여 발생하는 에러임을 나타냅니다.
+const MSEC2SEC = 0.001;
 
 const api42 = {
+  fetchToken: async function (req) {
+    let timeGap;
+    if (global.timeAfterUpdatingToken === undefined) {
+      this.setTokenToDB(req, updateRecord);
+    } else {
+      timeGap = (Date.now() - global.timeAfterUpdatingToken) * MSEC2SEC;
+    }
+    if (timeGap > req.session.expireTime) {
+      console.log("# AccessToken time out! => Called periodicFetchToken!");
+      this.setTokenToDB(req, updateRecord);
+    } else {
+      console.log("# [DEBUG] [", Date(), "] time gap: ", timeGap);
+    }
+  },
+  setTokenToDB: async function (req, sequelizeRecordAction) {
+    [ req.session.accessToken, req.session.expireTime ] = await getTokenFrom42Api();
+    await sequelizeRecordAction(AccessToken, req.session); // 비동기적으로 DB 갱신
+    console.log("# Updated access token from 42Api", req.session.accessToken);
+    console.log("# Updated expired time from 42Api", req.session.expireTime)
+    global.timeAfterUpdatingToken = Date.now();
+  }, 
   getUserData: async function (req, res, uriPart) {
     const reqUri = `${END_POINT_42_API}/v2/${uriPart}`;
 
     try {
-      //const { token: accessToken } = await AccessToken.findOne().then({where: {id: 1}});
-      const { token: accessToken } = await findRecord(AccessToken, {where: {id: 1}});
-      req.session.token = accessToken;
-      console.log("# token from database: ", req.session.token);
+      await getTokenFromDB(req);
     } catch (error) {
-      req.session.token = await getToken();
-      console.log("초기 DB access token 토큰: ", req.session.token);
-      await createRecord(AccessToken, req.session.token);
-      throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요😊');
-    }
-
-    if (req.session.token === null) {
-      const newAccessToken = await getToken();
-      console.log("# renew access token", newAccessToken);
-      await updateRecord(AccessToken, newAccessToken);
-      req.session.token = newAccessToken;
+      this.setTokenToDB(req, createRecord);
+      console.log("# Initialized access token from DB: ", req.session.accessToken)
+      console.log("# Initilaized expired time from DB: ", req.session.expireTime);
+      throw new Error('🖥 서버가 토큰을 처음 받습니다! 명령어를 한번 더 입력해주세요😊');
     }
 
     try {
-      const api42Response = await axios.all([axios42(req.session.token).get(reqUri)]);
+      const api42Response = await axios.all([axios42(req.session.accessToken).get(reqUri)]);
       ret = { ...api42Response[0].data };
       return ret;
     } catch (error) {
-      await updateRecord(AccessToken, null);
-      console.log("# axios42 error status: ", error.response.status);
-      // NOTE 1. token이 잘못된 경우, 2. 없는 intra id인 경우
-      if (error.response.status === 401) {
-        console.log('서버 갱신');
-        throw new Error('🖥 서버가 정보를 갱신했습니다! 한번 더 입력해주세요🤗');
-      } else if (error.response.status === 404) {          
-        console.log('없는 아이디');
-        throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다ㅠㅠ');
-      } else {
-        throw new Error('읭? 첨보는 에러에요ㅠㅠ');
+      // NOTE 1. token이 만료된 경우, 2. 없는 intra id인 경우
+      switch (error.response.status) {
+        case 401:
+          this.setTokenToDB(req, updateRecord);
+          console.log("# Updated access token from 42Api", req.session.accessToken);
+          console.log("# Updated expired time from 42Api", req.session.expireTime)
+          throw new Error('🖥 서버가 정보를 갱신했습니다! 명령어를 한번 더 입력해주세요🤗');
+          break;
+        case 404:
+          console.log('# invalid intra_id 입력');
+          throw new Error('👻 서버가 없는 아이디를 찾느라 고생중입니다😭');
+          break;
+        default:
+          throw new Error('읭? 첨보는 에러에요ㅠㅠ');
+          break;
       }
     }
   }

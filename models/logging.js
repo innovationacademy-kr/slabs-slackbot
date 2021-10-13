@@ -1,21 +1,26 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Suggestion = sequelize.define('Suggestion', {
+  const Logging = sequelize.define('Logging', {
     id: {
       type: DataTypes.INTEGER,
       allowNull:false,
       autoIncrement: true,
       primaryKey: true
     },
-    content: {
+    user_name: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
+    },
+    channel_name: {
+      type: DataTypes.STRING,
+    },
+    command: {
+      type: DataTypes.STRING,
+    },
+    arguments: {
+      type: DataTypes.STRING,
     },
   }, {
     timestamps: true
   });
-  return Suggestion;
+  return Logging;
 }
